@@ -13,14 +13,14 @@ const LOGFILE = "warren_log"
 
 func main() {
 	// Get args
-	sPort := flag.Int("sPort", 0, "Port to begin scanning with")
-	ePort := flag.Int("ePort", 65535, "Port to end scanning with")
+	startPort := flag.Int("sPort", 0, "Port to begin scanning with")
+	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
 
 	// Lock in args
 	flag.Parse()
 
 	// User arg verification
-	if *sPort > *ePort {
+	if *startPort > *endPort {
 		fmt.Fprintln(os.Stderr, errors.New("start port cannot be greater than end port"))
 	}
 
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Record information attained from user
-	message := fmt.Sprintf("Port range: %d-%d", *sPort, *ePort)
+	message := fmt.Sprintf("Port range: %d-%d", *startPort, *endPort)
 	err = scribe.Record(ledger.Info, message)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
