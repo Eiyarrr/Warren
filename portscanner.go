@@ -27,7 +27,7 @@ type Result struct {
 }
 
 // Needs to get args from func instead
-func portscanner(startPort int, endPort int, scribe ledger.Ledger) error {
+func portscanner(startPort int, endPort int, host string, scribe ledger.Ledger) error {
 	// User arg verification
 	if startPort > endPort {
 		return errors.New("start port cannot be greater than end port")
@@ -40,22 +40,23 @@ func portscanner(startPort int, endPort int, scribe ledger.Ledger) error {
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	_ = scribe.Record(ledger.Info, message)
 
-	results := beginScanning(startPort, endPort, scribe)
+	results := beginScanning(startPort, endPort, host, scribe)
 	fmt.Println(results)
 
 	return nil
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, scribe ledger.Ledger) []Result {
+func beginScanning(startPort int, endPort int, host string, scribe ledger.Ledger) []Result {
 	fmt.Println("Beginning port scan")
 	_ = scribe.Record(ledger.Info, "Beginning port scan")
 
+	results := []Result{}
 	for port := startPort; port <= endPort; port++ {
-		fmt.Println(port)
+		results = append(results, scan(host, port))
 	}
 
-	return nil
+	return results
 }
 
 // Scans a single port
