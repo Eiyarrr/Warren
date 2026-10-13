@@ -40,17 +40,15 @@ func portscanner(startPort int, endPort int, host string, scribe ledger.Ledger) 
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	_ = scribe.Record(ledger.Info, message)
 
-	results := beginScanning(startPort, endPort, host, scribe)
+	results := beginScanning(startPort, endPort, host)
 	fmt.Println(results)
+	// add scribe recording
 
 	return nil
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string, scribe ledger.Ledger) []Result {
-	fmt.Println("Beginning port scan")
-	_ = scribe.Record(ledger.Info, "Beginning port scan")
-
+func beginScanning(startPort int, endPort int, host string) []Result {
 	results := []Result{}
 	for port := startPort; port <= endPort; port++ {
 		results = append(results, scan(host, port))
