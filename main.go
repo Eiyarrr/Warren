@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +10,7 @@ import (
 
 const LOGFILE = "warren_log"
 
+// Needs to ask which service to use when more are created
 func main() {
 	// Get args
 	startPort := flag.Int("sPort", 0, "Port to begin scanning with")
@@ -18,11 +18,6 @@ func main() {
 
 	// Lock in args
 	flag.Parse()
-
-	// User arg verification
-	if *startPort > *endPort {
-		fmt.Fprintln(os.Stderr, errors.New("start port cannot be greater than end port"))
-	}
 
 	// Get ledger up and running
 	file, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -40,10 +35,5 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	// Record information attained from user
-	message := fmt.Sprintf("Port range: %d-%d", *startPort, *endPort)
-	err = scribe.Record(ledger.Info, message)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
+	portscanner(*startPort, *endPort, *scribe)
 }
