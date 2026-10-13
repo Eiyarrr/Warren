@@ -42,18 +42,22 @@ func portscanner(startPort int, endPort int, host string, scribe ledger.Ledger) 
 	message = "Hostname/IP: \"" + host + "\""
 	_ = scribe.Record(ledger.Info, message)
 
-	results := beginScanning(startPort, endPort, host)
-	fmt.Println(results)
-	// add scribe recording of results
+	// Information printed and logged
+	_ = beginScanning(startPort, endPort, host, scribe)
 
 	return nil
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string) []Result {
+func beginScanning(startPort int, endPort int, host string, scribe ledger.Ledger) []Result {
 	results := []Result{}
 	for port := startPort; port <= endPort; port++ {
-		results = append(results, scan(host, port))
+		r := scan(host, port)
+		results = append(results, r)
+
+		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %v | Error: %s", r.host, r.port, r.status, r.err)
+		fmt.Println(message)
+		scribe.Record(ledger.Info, message)
 	}
 
 	return results
@@ -93,4 +97,19 @@ func scan(host string, port int) Result {
 	result.status = Open
 	result.err = nil
 	return result
+}
+
+func (s *Status) String() string {
+	switch *s {
+		case Open:
+			return "Open"
+		case Timeout:
+			return "Timeout"
+		case Closed:
+			return "Closed"
+		case Err:
+			return "Err"
+		default:
+			return ""
+	}
 }
