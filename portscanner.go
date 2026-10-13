@@ -3,9 +3,28 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net"
+	"strconv"
+	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
 )
+
+type Status int
+
+const (
+	Open    Status = iota //0
+	Closed                //1
+	Timeout               //2
+	Err                   //3
+)
+
+type Result struct {
+	host   string
+	port   int
+	status Status
+	err    error
+}
 
 // Needs to get args from func instead
 func portscanner(startPort int, endPort int, scribe ledger.Ledger) error {
@@ -24,15 +43,14 @@ func portscanner(startPort int, endPort int, scribe ledger.Ledger) error {
 		return err
 	}
 
-
-	portStatuses := beginScanning(startPort, endPort, scribe)
-	fmt.Println(portStatuses)
+	results := beginScanning(startPort, endPort, scribe)
+	fmt.Println(results)
 
 	return nil
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, scribe ledger.Ledger) []bool {
+func beginScanning(startPort int, endPort int, scribe ledger.Ledger) []Result {
 	fmt.Println("Beginning port scan")
 	_ = scribe.Record(ledger.Info, "Beginning port scan")
 
@@ -44,6 +62,6 @@ func beginScanning(startPort int, endPort int, scribe ledger.Ledger) []bool {
 }
 
 // Scans a single port
-func scan(port int) bool {
-	return false
+func scan(host string, port int) Result {
+	return Result{}
 }
