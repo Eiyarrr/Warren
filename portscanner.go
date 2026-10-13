@@ -55,7 +55,7 @@ func beginScanning(startPort int, endPort int, host string, scribe ledger.Ledger
 		r := scan(host, port)
 		results = append(results, r)
 
-		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %v | Error: %s", r.host, r.port, r.status, r.err)
+		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %s", r.host, r.port, r.status.String(), r.err)
 		fmt.Println(message)
 		scribe.Record(ledger.Info, message)
 	}
