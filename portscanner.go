@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"syscall"
 	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
@@ -72,14 +73,17 @@ func scan(host string, port int) Result {
 	if err != nil {
 		var netErr net.Error
 
-		// converts err to a net.Error type then checks if it's a timeout
+		// errors.As() turns err into a netErr
 		if errors.As(err, &netErr) && netErr.Timeout() {
 			result.status = Timeout
+		} else if errors.Is(err, syscall.ECONNREFUSED) {
+			result.status = Closed
 		} else {
 			result.status = Err
 		}
 
 		result.err = err
+
 		return result
 	}
 	defer conn.Close()
