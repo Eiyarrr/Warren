@@ -23,11 +23,14 @@ func main() {
 	file, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
+	defer file.Close()
 
 	scribe, err := ledger.New(file)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 	err = scribe.Record(ledger.Info, "Ledger loaded!")
@@ -35,5 +38,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	portscanner(*startPort, *endPort, *scribe)
+	err = portscanner(*startPort, *endPort, *scribe)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
