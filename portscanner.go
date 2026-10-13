@@ -38,10 +38,7 @@ func portscanner(startPort int, endPort int, scribe ledger.Ledger) error {
 
 	// Record information attained from user
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
-	err := scribe.Record(ledger.Info, message)
-	if err != nil {
-		return err
-	}
+	_ = scribe.Record(ledger.Info, message)
 
 	results := beginScanning(startPort, endPort, scribe)
 	fmt.Println(results)
@@ -63,5 +60,32 @@ func beginScanning(startPort int, endPort int, scribe ledger.Ledger) []Result {
 
 // Scans a single port
 func scan(host string, port int) Result {
-	return Result{}
+	result := Result{
+		host: host,
+		port: port,
+	}
+
+	// create network address
+	addr := net.JoinHostPort(host, strconv.Itoa(port))
+
+	// attempt to make a TCP connection onto addr
+	conn, err := net.DialTimeout("tcp", addr, 3*time.Second)
+	if err != nil {
+		var netErr net.Error
+
+		// converts err to a net.Error type then checks if it's a timeout
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			result.status = Timeout
+		} else {
+			result.status = Err
+		}
+
+		result.err = err
+		return result
+	}
+	defer conn.Close()
+
+	result.status = Open
+	result.err = nil
+	return result
 }
