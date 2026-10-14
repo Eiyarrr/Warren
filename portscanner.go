@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
 	"strconv"
 	"syscall"
 	"time"
@@ -38,9 +39,15 @@ func portscanner(startPort int, endPort int, host string, scribe ledger.Ledger) 
 
 	// Record information attained from user
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
-	_ = scribe.Record(ledger.Info, message)
+	err := scribe.Record(ledger.Info, message)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 	message = "Hostname/IP: \"" + host + "\""
-	_ = scribe.Record(ledger.Info, message)
+	err = scribe.Record(ledger.Info, message)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 
 	// Information printed and logged
 	_ = beginScanning(startPort, endPort, host, scribe)
@@ -57,7 +64,10 @@ func beginScanning(startPort int, endPort int, host string, scribe ledger.Ledger
 
 		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %s", r.host, r.port, r.status.String(), r.err)
 		fmt.Println(message)
-		scribe.Record(ledger.Info, message)
+		err := scribe.Record(ledger.Info, message)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
 	}
 
 	return results
@@ -92,24 +102,24 @@ func scan(host string, port int) Result {
 
 		return result
 	}
-	conn.Close()
+	defer conn.Close()
 
 	result.status = Open
 	result.err = nil
 	return result
 }
 
-func (s *Status) String() string {
-	switch *s {
-		case Open:
-			return "Open"
-		case Timeout:
-			return "Timeout"
-		case Closed:
-			return "Closed"
-		case Err:
-			return "Err"
-		default:
-			return ""
+func (s Status) String() string {
+	switch s {
+	case Open:
+		return "Open"
+	case Timeout:
+		return "Timeout"
+	case Closed:
+		return "Closed"
+	case Err:
+		return "Err"
+	default:
+		return ""
 	}
 }
