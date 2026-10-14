@@ -12,7 +12,7 @@ import (
 )
 
 // Needs to get args from func instead
-func Portscanner(startPort int, endPort int, host string, workers int, scribe ledger.Ledger) error {
+func Portscanner(startPort int, endPort int, host string, workers int, timeoutSeconds int, scribe ledger.Ledger) error {
 	// User arg verification
 	if startPort > endPort {
 		return errors.New("start port cannot be greater than end port")
@@ -41,7 +41,7 @@ func Portscanner(startPort int, endPort int, host string, workers int, scribe le
 	}
 
 	// Information printed and logged
-	results := beginScanning(startPort, endPort, host, workers)
+	results := beginScanning(startPort, endPort, host, workers, timeoutSeconds)
 	for _, result := range results {
 		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
 		fmt.Println(message)
@@ -55,7 +55,7 @@ func Portscanner(startPort int, endPort int, host string, workers int, scribe le
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string, workers int) []Result {
+func beginScanning(startPort int, endPort int, host string, workers int, timeoutSeconds int) []Result {
 	jobs := make(chan int)
 	results := make(chan Result)
 

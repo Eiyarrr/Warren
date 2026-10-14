@@ -18,6 +18,7 @@ func main() {
 	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
 	hostname := flag.String("host", "", "Host to scan")
 	workers := flag.Int("workers", 50, "Number of Go workers to use")
+	timeoutSeconds := flag.Int("timeout", 3, "Seconds before a timeout")
 
 	// Lock in args
 	flag.Parse()
@@ -41,7 +42,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	err = portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, *scribe)
+	err = portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, *timeoutSeconds, *scribe)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
