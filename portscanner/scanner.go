@@ -44,25 +44,41 @@ func beginScanning(startPort int, endPort int, host string, workers int, scribe 
 	jobs := make(chan int)
 	results := make(chan Result)
 
+	var wg sync.WaitGroup
+
 	// spawn the persistent workers immediately
-	for _ = range workers {
+	for range workers {
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
+
 			for job := range jobs {
 				scan(host, job, results)
 			}
 		}()
 	}
 
-	/*
-	for port := startPort; port <= endPort; port++ {
-		result := scan(host, port)
+	// Inside a separate goroutine to prevent blocking from others
+	go func() {
+		for port := startPort; port <= endPort; port++ {
+			jobs <- port
+		}
+		close(jobs)
+	}()
 
-		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %s", result.host, result.port, result.status.String(), result.err)
+	// also must be goroutine to prevent blocking
+	go func() {
+		// Wait() waits for all workers to call Done()
+		wg.Wait()
+		close(results)
+	}()
+
+	for result := range results {
+		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.host, result.port, result.status.String(), result.err)
 		fmt.Println(message)
 		err := scribe.Record(ledger.Info, message)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}
-	*/
 }
