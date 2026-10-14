@@ -2,6 +2,7 @@ package portscanner
 
 import (
 	"testing"
+	"time"
 )
 
 func TestWorkers(t *testing.T) {
@@ -9,7 +10,7 @@ func TestWorkers(t *testing.T) {
 	startPort := 50000
 	endPort := 50009
 	workers := 3
-	timeoutSeconds := 3
+	timeoutSeconds := time.Duration(3)*time.Second
 
 	results := beginScanning(startPort, endPort, host, workers, timeoutSeconds)
 
