@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
 )
@@ -67,7 +68,7 @@ func beginScanning(startPort int, endPort int, host string, workers int) []Resul
 			defer wg.Done()
 
 			for job := range jobs {
-				Scan(host, job, results)
+				Scan(host, job, 3*time.Second, results)
 			}
 		}()
 	}
