@@ -20,9 +20,15 @@ func TestWorkers(t *testing.T) {
 	}
 
 	for _, result := range results {
-		if seenPorts[result.Port] {
-			t.Fatalf("expected unique ports, got duplicate at %d", result.Port)
+		port := result.Port
+
+		if port < startPort || port > endPort {
+			t.Fatalf("port %d is outside the requested range", port)
 		}
-		seenPorts[result.Port] = true
+
+		if seenPorts[port] {
+			t.Fatalf("expected unique ports, got duplicate at %d", port)
+		}
+		seenPorts[port] = true
 	}
 }
