@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 
 	ledger "github.com/Eiyarrr/Ledger"
@@ -28,6 +29,11 @@ func Portscanner(startPort int, endPort int, host string, workers int, scribe le
 		fmt.Fprintln(os.Stderr, err)
 	}
 	message = "Hostname/IP: \"" + host + "\""
+	err = scribe.Record(ledger.Info, message)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+	message = "Worker count: " + strconv.Itoa(workers)
 	err = scribe.Record(ledger.Info, message)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

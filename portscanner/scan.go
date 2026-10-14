@@ -9,7 +9,7 @@ import (
 )
 
 // Scans a single port
-func scan(host string, port int, results chan <- Result) {
+func scan(host string, port int, results chan<- Result) {
 	result := Result{
 		host: host,
 		port: port,
