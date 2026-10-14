@@ -9,8 +9,9 @@ func TestWorkers(t *testing.T) {
 	startPort := 50000
 	endPort := 50009
 	workers := 3
+	timeoutSeconds := 3
 
-	results := beginScanning(startPort, endPort, host, workers)
+	results := beginScanning(startPort, endPort, host, workers, timeoutSeconds)
 
 	expectedCount := endPort - startPort + 1
 	seenPorts := make(map[int]bool)
