@@ -6,6 +6,7 @@ import (
 	"os"
 
 	ledger "github.com/Eiyarrr/Ledger"
+	"github.com/Eiyarrr/Warren/portscanner"
 )
 
 const LOGFILE = "warren_log"
@@ -40,7 +41,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	err = portscanner(*startPort, *endPort, *hostname, *workers, *scribe)
+	err = portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, *scribe)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
