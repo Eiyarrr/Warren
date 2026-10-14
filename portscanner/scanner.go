@@ -1,7 +1,6 @@
 package portscanner
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -12,16 +11,6 @@ import (
 
 // Needs to get args from func instead
 func Portscanner(startPort int, endPort int, host string, workers int, timeoutSeconds int, scribe ledger.Ledger) error {
-	// User arg verification
-	if startPort > endPort {
-		return errors.New("start port cannot be greater than end port")
-	} else if startPort < 0 || endPort > 65535 {
-		return errors.New("ports must be between 0 and 65535")
-	}
-	if workers <= 0 {
-		return errors.New("worker count must be greater than 0")
-	}
-
 	// Record information attained from user
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	err := scribe.Record(ledger.Info, message)

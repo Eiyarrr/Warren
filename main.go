@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -22,6 +23,12 @@ func main() {
 
 	// Lock in args
 	flag.Parse()
+
+	err := verifyFlags(*startPort, *endPort, *workers, *timeoutSeconds)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	// Get ledger up and running
 	file, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -47,4 +54,21 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
+	// User arg verification
+	if startPort > endPort {
+		return errors.New("start port cannot be greater than end port")
+	} else if startPort < 0 || endPort > 65535 {
+		return errors.New("ports must be between 0 and 65535")
+	}
+	if workers <= 0 {
+		return errors.New("worker count must be greater than 0")
+	}
+	if timeoutSeconds <= 0 {
+		return errors.New("timeout must be greater than 0")
+	}
+
+	return nil
 }
