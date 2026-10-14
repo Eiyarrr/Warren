@@ -40,13 +40,21 @@ func Portscanner(startPort int, endPort int, host string, workers int, scribe le
 	}
 
 	// Information printed and logged
-	beginScanning(startPort, endPort, host, workers, scribe)
+	results := beginScanning(startPort, endPort, host, workers)
+	for _, result := range results {
+		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
+		fmt.Println(message)
+		err := scribe.Record(ledger.Info, message)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
+	}
 
 	return nil
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string, workers int, scribe ledger.Ledger) {
+func beginScanning(startPort int, endPort int, host string, workers int) []Result {
 	jobs := make(chan int)
 	results := make(chan Result)
 
@@ -79,12 +87,10 @@ func beginScanning(startPort int, endPort int, host string, workers int, scribe 
 		close(results)
 	}()
 
+	retResults := []Result{}
 	for result := range results {
-		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
-		fmt.Println(message)
-		err := scribe.Record(ledger.Info, message)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
+		retResults = append(retResults, result)
 	}
+
+	return retResults
 }

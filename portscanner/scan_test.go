@@ -16,8 +16,11 @@ func TestOpenPort(t *testing.T) {
 	}
 	defer listener.Close()
 
-	// get host and port as a string
-	host, portStr, err := net.SplitHostPort(listener.Addr().String())
+	// get the network address
+	addr := listener.Addr().String()
+
+	// get host and port as strings
+	host, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		t.Fatalf("failed to split listener address: %v", err)
 	}
