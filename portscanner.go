@@ -29,12 +29,15 @@ type Result struct {
 }
 
 // Needs to get args from func instead
-func portscanner(startPort int, endPort int, host string, scribe ledger.Ledger) error {
+func portscanner(startPort int, endPort int, host string, workers int, scribe ledger.Ledger) error {
 	// User arg verification
 	if startPort > endPort {
 		return errors.New("start port cannot be greater than end port")
 	} else if startPort < 0 || endPort > 65535 {
 		return errors.New("ports must be between 0 and 65535")
+	}
+	if workers <= 0 {
+		return errors.New("worker count must be greater than 0")
 	}
 
 	// Record information attained from user
@@ -50,13 +53,13 @@ func portscanner(startPort int, endPort int, host string, scribe ledger.Ledger) 
 	}
 
 	// Information printed and logged
-	beginScanning(startPort, endPort, host, scribe)
+	beginScanning(startPort, endPort, host, workers, scribe)
 
 	return nil
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string, scribe ledger.Ledger) {
+func beginScanning(startPort int, endPort int, host string, workers int, scribe ledger.Ledger) {
 	for port := startPort; port <= endPort; port++ {
 		result := scan(host, port)
 
