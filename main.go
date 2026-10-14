@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
@@ -49,7 +50,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	err = portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, *timeoutSeconds, *scribe)
+	err = portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second, *scribe)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

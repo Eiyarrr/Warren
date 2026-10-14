@@ -5,12 +5,13 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
 )
 
 // Needs to get args from func instead
-func Portscanner(startPort int, endPort int, host string, workers int, timeoutSeconds int, scribe ledger.Ledger) error {
+func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration, scribe ledger.Ledger) error {
 	// Record information attained from user
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	err := scribe.Record(ledger.Info, message)
@@ -29,7 +30,7 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeoutSe
 	}
 
 	// Information printed and logged
-	results := beginScanning(startPort, endPort, host, workers, timeoutSeconds)
+	results := beginScanning(startPort, endPort, host, workers, timeout)
 	for _, result := range results {
 		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
 		fmt.Println(message)
@@ -43,7 +44,7 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeoutSe
 }
 
 // Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string, workers int, timeoutSeconds int) []Result {
+func beginScanning(startPort int, endPort int, host string, workers int, timeout time.Duration) []Result {
 	jobs := make(chan int)
 	results := make(chan Result)
 
