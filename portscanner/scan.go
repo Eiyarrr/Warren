@@ -9,7 +9,7 @@ import (
 )
 
 // Scans a single port
-func scan(host string, port int) Result {
+func scan(host string, port int, results chan <- Result) {
 	result := Result{
 		host: host,
 		port: port,
@@ -32,14 +32,14 @@ func scan(host string, port int) Result {
 		} else {
 			result.status = Err
 		}
-
 		result.err = err
 
-		return result
+		results <- result
+		return
 	}
 	defer conn.Close()
 
 	result.status = Open
 	result.err = nil
-	return result
+	results <- result
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	ledger "github.com/Eiyarrr/Ledger"
 )
@@ -40,6 +41,19 @@ func Portscanner(startPort int, endPort int, host string, workers int, scribe le
 
 // Looping & semaphore & randomization logic
 func beginScanning(startPort int, endPort int, host string, workers int, scribe ledger.Ledger) {
+	jobs := make(chan int)
+	results := make(chan Result)
+
+	// spawn the persistent workers immediately
+	for _ = range workers {
+		go func() {
+			for job := range jobs {
+				scan(host, job, results)
+			}
+		}()
+	}
+
+	/*
 	for port := startPort; port <= endPort; port++ {
 		result := scan(host, port)
 
@@ -50,4 +64,5 @@ func beginScanning(startPort int, endPort int, host string, workers int, scribe 
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}
+	*/
 }
