@@ -13,7 +13,7 @@ const LOGFILE = "warren_log"
 // Needs to ask which service to use when more are created
 func main() {
 	// Get args
-	startPort := flag.Int("sPort", 0, "Port to begin scanning with")
+	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
 	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
 	hostname := flag.String("host", "", "Host to scan")
 
