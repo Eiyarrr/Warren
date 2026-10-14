@@ -4,7 +4,6 @@ import (
 	"net"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/Eiyarrr/Warren/portscanner"
 )
@@ -33,7 +32,7 @@ func TestOpenPort(t *testing.T) {
 	}
 
 	result := make(chan portscanner.Result, 1)
-	portscanner.Scan(host, port, 3*time.Second, result)
+	portscanner.Scan(host, port, 3, result)
 	close(result)
 
 	r := <-result
@@ -70,7 +69,7 @@ func TestClosedPort(t *testing.T) {
 	}
 
 	result := make(chan portscanner.Result, 1)
-	portscanner.Scan(host, port, 3*time.Second, result)
+	portscanner.Scan(host, port, 3, result)
 	close(result)
 
 	r := <-result
