@@ -59,7 +59,7 @@ func beginScanning(startPort int, endPort int, host string, workers int, scribe 
 			defer wg.Done()
 
 			for job := range jobs {
-				scan(host, job, results)
+				Scan(host, job, results)
 			}
 		}()
 	}
@@ -80,7 +80,7 @@ func beginScanning(startPort int, endPort int, host string, workers int, scribe 
 	}()
 
 	for result := range results {
-		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.host, result.port, result.status.String(), result.err)
+		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
 		fmt.Println(message)
 		err := scribe.Record(ledger.Info, message)
 		if err != nil {

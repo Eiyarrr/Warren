@@ -1,8 +1,8 @@
 package portscanner
 
 type Result struct {
-	host   string
-	port   int
-	status Status
-	err    error
+	Host   string
+	Port   int
+	Status Status
+	Err    error
 }

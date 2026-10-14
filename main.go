@@ -6,7 +6,7 @@ import (
 	"os"
 
 	ledger "github.com/Eiyarrr/Ledger"
-	"github.com/Eiyarrr/Warren/portscanner"
+	portscanner "github.com/Eiyarrr/Warren/portscanner"
 )
 
 const LOGFILE = "warren_log"

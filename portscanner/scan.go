@@ -9,10 +9,10 @@ import (
 )
 
 // Scans a single port
-func scan(host string, port int, results chan<- Result) {
+func Scan(host string, port int, results chan<- Result) {
 	result := Result{
-		host: host,
-		port: port,
+		Host: host,
+		Port: port,
 	}
 
 	// create network address
@@ -26,20 +26,20 @@ func scan(host string, port int, results chan<- Result) {
 		// errors.As() turns err into a netErr
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
-			result.status = Timeout
+			result.Status = Timeout
 		} else if errors.Is(err, syscall.ECONNREFUSED) {
-			result.status = Closed
+			result.Status = Closed
 		} else {
-			result.status = Err
+			result.Status = Err
 		}
-		result.err = err
+		result.Err = err
 
 		results <- result
 		return
 	}
 	defer conn.Close()
 
-	result.status = Open
-	result.err = nil
+	result.Status = Open
+	result.Err = nil
 	results <- result
 }
