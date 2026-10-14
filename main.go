@@ -17,7 +17,7 @@ func main() {
 	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
 	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
 	hostname := flag.String("host", "", "Host to scan")
-	workers := flag.Int("workers", 1, "Number of Go workers to use")
+	workers := flag.Int("workers", 50, "Number of Go workers to use")
 
 	// Lock in args
 	flag.Parse()
