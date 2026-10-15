@@ -9,7 +9,7 @@ import (
 )
 
 func TestRunScan(t *testing.T) {
-	args := []string{"scan", "-start-port", "80", "end-port", "80"}
+	args := []string{"scan", "-start-port", "80", "-end-port", "80"}
 
 	err := cli.Run(args, "", "")
 	if err != nil {

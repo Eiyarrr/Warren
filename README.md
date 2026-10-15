@@ -4,8 +4,9 @@ Warren is a network service mapper in progress. I created it because I am intere
 *Warren is under the MIT License, for more information, see [LICENSE](LICENSE)*
 
 ## Features
-- **Portscanning**: ScanRange scans a range of ports and returns ([]Result, error). Scan attempts to connect to a single port and sends its result through a channel. Connection errors are reported through the Result.Err field.
+- **Port scanning**: ScanRange scans a range of ports and returns ([]Result, error). Scan attempts to connect to a single port and sends its result through a channel. Connection errors are reported through the Result.Err field.
 - **Error Handling**: Warren provides exported sentinel error values for specific port-scanning configuration failures.
+- **REPL-style CLI**: Warren can run individual commands directly or launch an interactive REPL for executing multiple commands in a single session.
 
 ## Testing
 To run the test suite for this project, clone the repository, enter its directory, and run `go test ./...`
