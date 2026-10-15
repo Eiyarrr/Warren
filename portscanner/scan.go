@@ -21,6 +21,14 @@ func Scan(host string, port int, timeout time.Duration, results chan<- Result) {
 		Port: port,
 	}
 
+	if timeout <= 0 {
+		result.Status = Err
+		result.Err = errors.New("timeout must be greater than 0")
+
+		results <- result
+		return
+	}
+
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
 
 	conn, err := net.DialTimeout("tcp", addr, timeout)

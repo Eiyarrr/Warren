@@ -1,6 +1,7 @@
 package portscanner
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -14,6 +15,18 @@ import (
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
 func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration, scribe ledger.Ledger) error {
+	if startPort > endPort {
+		fmt.Fprintln(os.Stderr, errors.New("start port cannot be greater than end port"))
+	} else if startPort < 0 || endPort > 65535 {
+		fmt.Fprintln(os.Stderr, errors.New("ports must be between 0 and 65535"))
+	}
+	if workers <= 0 {
+		fmt.Fprintln(os.Stderr, errors.New("worker count must be greater than 0"))
+	}
+	if timeout <= 0 {
+		fmt.Fprintln(os.Stderr, errors.New("timeout must be greater than 0"))
+	}
+
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	err := scribe.Record(ledger.Info, message)
 	if err != nil {
