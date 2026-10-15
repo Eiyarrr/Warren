@@ -11,7 +11,7 @@ import (
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
 )
 
-func RunScan(args []string, logFile string) error {
+func runScan(args []string, logFile string) error {
 	scanFlags := flag.NewFlagSet("scan", flag.ContinueOnError)
 
 	host := scanFlags.String("host", "127.0.0.1", "Target host")
