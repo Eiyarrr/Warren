@@ -24,6 +24,7 @@ func main() {
 		err := runScan(os.Args[2:])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
 		}
 		return
 	case "help":
@@ -34,21 +35,6 @@ func main() {
 		return
 	default:
 		fmt.Println("Error, unknown command")
-		os.Exit(1)
-	}
-
-	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
-	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
-	hostname := flag.String("host", "", "Host to scan")
-	workers := flag.Int("workers", 50, "Number of Go workers to use")
-	timeoutSeconds := flag.Int("timeout", 3, "Seconds before a timeout")
-	common := flag.Bool("common", false, "Scan just the common ports?")
-
-	flag.Parse()
-
-	err := verifyFlags(*startPort, *endPort, *workers, *timeoutSeconds)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -68,29 +54,6 @@ func main() {
 	err = scribe.Record(ledger.Info, "Ledger loaded!")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-	}
-
-	var results []portscanner.Result
-	err = nil
-	if *common {
-		results, err = portscanner.ScanCommon(*hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
-	} else {
-		results, err = portscanner.ScanRange(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
-	}
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-
-		message := fmt.Sprintf("Error occurred while scanning: %v", err)
-		err = scribe.Record(ledger.Fatal, message)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-
-		os.Exit(1)
-	}
-
-	for _, result := range results {
-		fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
 	}
 }
 
@@ -112,14 +75,24 @@ func runScan(args []string) error {
 
 	host := scanFlags.String("host", "127.0.0.1", "Target host")
 	startPort := scanFlags.Int("start-port", 1, "First port in the range")
-	endPort := scanFlags.Int("end-port", 65535, "Last port in the range")
+	endPort := scanFlags.Int("end-port", 1024, "Last port in the range")
+	workers := scanFlags.Int("workers", 50, "Number of Go workers to use")
+	timeoutSeconds := scanFlags.Int("timeout", 3, "Seconds before a timeout")
 
 	err := scanFlags.Parse(args)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Host: %s, Start port: %d, End port: %d\n", *host, *startPort, *endPort)
+	fmt.Printf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout seconds: %d\n", *host, *startPort, *endPort, *workers, *timeoutSeconds)
+	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, time.Duration(*timeoutSeconds)*time.Second)
+	if err != nil {
+		return err
+	}
+
+	for _, result := range results {
+		fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+	}
 
 	return nil
 }
