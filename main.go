@@ -20,6 +20,7 @@ func main() {
 	}
 
 	switch os.Args[1] {
+
 	case "scan":
 		err := runScan(os.Args[2:])
 		if err != nil {
@@ -27,47 +28,20 @@ func main() {
 			os.Exit(1)
 		}
 		return
+
 	case "help":
 		fmt.Println("Help!")
 		return
+
 	case "version":
 		fmt.Println("v0.1.0 - DEV")
 		return
+
 	default:
 		fmt.Println("Error, unknown command")
 		os.Exit(1)
 	}
 
-	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	defer file.Close()
-
-	scribe, err := ledger.New(file)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	err = scribe.Record(ledger.Info, "Ledger loaded!")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
-}
-
-// verifyFlags verifies that all user given flags are allowed by Warren.
-func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
-	if startPort > endPort || startPort < 0 || endPort > 65535 {
-		return portscanner.ErrInvalidPortRange
-	} else if workers <= 0 {
-		return portscanner.ErrInvalidWorkerCount
-	} else if timeoutSeconds <= 0 {
-		return portscanner.ErrInvalidTimeout
-	}
-
-	return nil
 }
 
 func runScan(args []string) error {
@@ -84,7 +58,33 @@ func runScan(args []string) error {
 		return err
 	}
 
-	fmt.Printf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout seconds: %d\n", *host, *startPort, *endPort, *workers, *timeoutSeconds)
+	err = verifyFlags(*startPort, *endPort, *workers, *timeoutSeconds)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scribe, err := ledger.New(file)
+	if err != nil {
+		return err
+	}
+
+	err = scribe.Record(ledger.Info, "Ledger loaded!")
+	if err != nil {
+		return err
+	}
+
+	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout seconds: %d\n", *host, *startPort, *endPort, *workers, *timeoutSeconds)
+	err = scribe.Record(ledger.Info, message)
+	if err != nil {
+		return err
+	}
+
 	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, time.Duration(*timeoutSeconds)*time.Second)
 	if err != nil {
 		return err
@@ -92,6 +92,19 @@ func runScan(args []string) error {
 
 	for _, result := range results {
 		fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+	}
+
+	return nil
+}
+
+// verifyFlags verifies that all user given flags are allowed by Warren.
+func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
+	if startPort > endPort || startPort < 0 || endPort > 65535 {
+		return portscanner.ErrInvalidPortRange
+	} else if workers <= 0 {
+		return portscanner.ErrInvalidWorkerCount
+	} else if timeoutSeconds <= 0 {
+		return portscanner.ErrInvalidTimeout
 	}
 
 	return nil
