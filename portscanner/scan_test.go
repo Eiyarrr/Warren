@@ -17,16 +17,13 @@ func TestOpenPort(t *testing.T) {
 	}
 	defer listener.Close()
 
-	// get the network address
 	addr := listener.Addr().String()
 
-	// get host and port as strings
 	host, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		t.Fatalf("failed to split listener address: %v", err)
 	}
 
-	// convert port to int
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		t.Fatalf("failed to parse port: %v", err)
@@ -49,21 +46,17 @@ func TestClosedPort(t *testing.T) {
 		t.Fatalf("failed to create listener: %v", err)
 	}
 
-	// get the network address
 	addr := listener.Addr().String()
-	// close the listener to make a closed port
 	err = listener.Close()
 	if err != nil {
 		t.Fatalf("failed to close listener: %v", err)
 	}
 
-	// get host and port as strings
 	host, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		t.Fatalf("failed to split listener address: %v", err)
 	}
 
-	// convert port to int
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		t.Fatalf("failed to parse port: %v", err)

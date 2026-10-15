@@ -8,7 +8,7 @@ const (
 	// Open indicates that a successful TCP connection was established
 	Open Status = iota
 
-	// Closed indicates that a RST packet was received.
+	// Closed indicates that the connection attempt was refused.
 	Closed
 
 	// Timeout indicates that the connection attempt exceeded the allotted timespan.
