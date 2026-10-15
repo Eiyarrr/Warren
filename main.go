@@ -60,11 +60,9 @@ func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) er
 		return errors.New("start port cannot be greater than end port")
 	} else if startPort < 0 || endPort > 65535 {
 		return errors.New("ports must be between 0 and 65535")
-	}
-	if workers <= 0 {
+	} else if workers <= 0 {
 		return errors.New("worker count must be greater than 0")
-	}
-	if timeoutSeconds <= 0 {
+	} else if timeoutSeconds <= 0 {
 		return errors.New("timeout must be greater than 0")
 	}
 

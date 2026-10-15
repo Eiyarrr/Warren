@@ -18,11 +18,9 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeout t
 		return errors.New("start port cannot be greater than end port")
 	} else if startPort < 0 || endPort > 65535 {
 		return errors.New("ports must be between 0 and 65535")
-	}
-	if workers <= 0 {
+	} else if workers <= 0 {
 		return errors.New("worker count must be greater than 0")
-	}
-	if timeout <= 0 {
+	} else if timeout <= 0 {
 		return errors.New("timeout must be greater than 0")
 	}
 
