@@ -9,7 +9,7 @@ import (
 )
 
 func TestRunScan(t *testing.T) {
-	args := []string{"scan"}
+	args := []string{"scan", "-start-port", "80", "end-port", "80"}
 
 	err := cli.Run(args, "", "")
 	if err != nil {
@@ -41,5 +41,14 @@ func TestInvalidTimeout(t *testing.T) {
 	err := cli.Run(args, "", "")
 	if !errors.Is(err, portscanner.ErrInvalidTimeout) {
 		t.Fatalf("expected %v, got %v", portscanner.ErrInvalidTimeout, err)
+	}
+}
+
+func TestUnknownCommand(t *testing.T) {
+	args := []string{"Unknown Command"}
+
+	err := cli.Run(args, "", "")
+	if err == nil {
+		t.Fatalf("expected error for unknown command")
 	}
 }
