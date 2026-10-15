@@ -51,14 +51,14 @@ func runScan(args []string) error {
 	startPort := scanFlags.Int("start-port", 1, "First port in the range")
 	endPort := scanFlags.Int("end-port", 1024, "Last port in the range")
 	workers := scanFlags.Int("workers", 50, "Number of Go workers to use")
-	timeoutSeconds := scanFlags.Int("timeout", 3, "Seconds before a timeout")
+	timeout := scanFlags.Duration("timeout", 3*time.Second, "Time before scanner assumes a timeout")
 
 	err := scanFlags.Parse(args)
 	if err != nil {
 		return err
 	}
 
-	err = verifyFlags(*startPort, *endPort, *workers, *timeoutSeconds)
+	err = verifyFlags(*startPort, *endPort, *workers, *timeout)
 	if err != nil {
 		return err
 	}
@@ -79,13 +79,13 @@ func runScan(args []string) error {
 		return err
 	}
 
-	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout seconds: %d\n", *host, *startPort, *endPort, *workers, *timeoutSeconds)
+	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %d\n", *host, *startPort, *endPort, *workers, *timeout)
 	err = scribe.Record(ledger.Info, message)
 	if err != nil {
 		return err
 	}
 
-	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, time.Duration(*timeoutSeconds)*time.Second)
+	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
 	if err != nil {
 		return err
 	}
@@ -98,12 +98,12 @@ func runScan(args []string) error {
 }
 
 // verifyFlags verifies that all user given flags are allowed by Warren.
-func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
+func verifyFlags(startPort int, endPort int, workers int, timeout time.Duration) error {
 	if startPort > endPort || startPort < 0 || endPort > 65535 {
 		return portscanner.ErrInvalidPortRange
 	} else if workers <= 0 {
 		return portscanner.ErrInvalidWorkerCount
-	} else if timeoutSeconds <= 0 {
+	} else if timeout <= 0 {
 		return portscanner.ErrInvalidTimeout
 	}
 
