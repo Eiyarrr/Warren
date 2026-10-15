@@ -2,15 +2,10 @@
 package main
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
 	"os"
-	"strings"
-	"time"
 
-	ledger "github.com/Eiyarrr/Ledger"
-	portscanner "github.com/Eiyarrr/Warren/portscanner"
+	"github.com/Eiyarrr/Warren/cli"
 )
 
 const logFile = "warren_log"
@@ -18,7 +13,7 @@ const version = "v0.1.0 - DEV"
 
 func main() {
 	if len(os.Args) == 1 {
-		err := runInteractive()
+		err := cli.RunInteractive(version, logFile)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -28,7 +23,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "scan":
-		err := runScan(os.Args[2:])
+		err := cli.RunScan(os.Args[2:], logFile)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -36,7 +31,7 @@ func main() {
 		return
 
 	case "help":
-		fmt.Println(helpMessage)
+		fmt.Println(cli.HelpMessage)
 		return
 
 	case "version":
@@ -47,107 +42,4 @@ func main() {
 		fmt.Println("Error, unknown command")
 		os.Exit(1)
 	}
-}
-
-func runInteractive() error {
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for {
-		fmt.Print("warren> ")
-
-		if !scanner.Scan() {
-			err := scanner.Err()
-			if err != nil {
-				return err
-			}
-			return nil
-		}
-
-		input := strings.ToLower(strings.TrimSpace(scanner.Text()))
-
-		switch input {
-		case "":
-			continue
-		case "exit":
-			return nil
-		case "version":
-			fmt.Println(version)
-		case "help":
-			fmt.Println(helpMessage)
-		default:
-			fields := strings.Fields(input)
-			if fields[0] == "scan" {
-				err := runScan(fields[1:])
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-				}
-			}
-		}
-	}
-}
-
-func runScan(args []string) error {
-	scanFlags := flag.NewFlagSet("scan", flag.ContinueOnError)
-
-	host := scanFlags.String("host", "127.0.0.1", "Target host")
-	startPort := scanFlags.Int("start-port", 1, "First port in the range")
-	endPort := scanFlags.Int("end-port", 1024, "Last port in the range")
-	workers := scanFlags.Int("workers", 50, "Number of Go workers to use")
-	timeout := scanFlags.Duration("timeout", 3*time.Second, "Time before scanner assumes a timeout")
-
-	err := scanFlags.Parse(args)
-	if err != nil {
-		return err
-	}
-
-	err = verifyFlags(*startPort, *endPort, *workers, *timeout)
-	if err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	scribe, err := ledger.New(file)
-	if err != nil {
-		return err
-	}
-
-	err = scribe.Record(ledger.Info, "Ledger loaded!")
-	if err != nil {
-		return err
-	}
-
-	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s\n", *host, *startPort, *endPort, *workers, *timeout)
-	err = scribe.Record(ledger.Info, message)
-	if err != nil {
-		return err
-	}
-
-	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
-	if err != nil {
-		return err
-	}
-
-	for _, result := range results {
-		fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
-	}
-
-	return nil
-}
-
-// verifyFlags verifies that all user given flags are allowed by Warren.
-func verifyFlags(startPort int, endPort int, workers int, timeout time.Duration) error {
-	if startPort > endPort || startPort < 0 || endPort > 65535 || startPort > 65535 || endPort < 0 {
-		return portscanner.ErrInvalidPortRange
-	} else if workers <= 0 {
-		return portscanner.ErrInvalidWorkerCount
-	} else if timeout <= 0 {
-		return portscanner.ErrInvalidTimeout
-	}
-
-	return nil
 }
