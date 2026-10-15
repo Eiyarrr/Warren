@@ -10,8 +10,10 @@ import (
 	ledger "github.com/Eiyarrr/Ledger"
 )
 
-// Needs to get args from func instead
-func Portscanner(startPort int, endPort int, host string, workers int, timeoutSeconds time.Duration, scribe ledger.Ledger) error {
+// Portscanner scans the specified host in the inclusive port range using the
+// given number of workers and timeout.
+// Each result is printed to the console and logged using Ledger.
+func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration, scribe ledger.Ledger) error {
 	// Record information attained from user
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	err := scribe.Record(ledger.Info, message)
@@ -30,7 +32,7 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeoutSe
 	}
 
 	// Information printed and logged
-	results := beginScanning(startPort, endPort, host, workers, timeoutSeconds)
+	results := beginScanning(startPort, endPort, host, workers, timeout)
 	for _, result := range results {
 		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
 		fmt.Println(message)
@@ -43,8 +45,9 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeoutSe
 	return nil
 }
 
-// Looping & semaphore & randomization logic
-func beginScanning(startPort int, endPort int, host string, workers int, timeoutSeconds time.Duration) []Result {
+// beginScanning distributes the specified port range across a worker pool and
+// returns one Result for each port scanned.
+func beginScanning(startPort int, endPort int, host string, workers int, timeout time.Duration) []Result {
 	jobs := make(chan int)
 	results := make(chan Result)
 
@@ -57,7 +60,7 @@ func beginScanning(startPort int, endPort int, host string, workers int, timeout
 			defer wg.Done()
 
 			for job := range jobs {
-				Scan(host, job, timeoutSeconds, results)
+				Scan(host, job, timeout, results)
 			}
 		}()
 	}

@@ -8,20 +8,24 @@ import (
 	"time"
 )
 
-// Scans a single port
-func Scan(host string, port int, timeoutSeconds time.Duration, results chan<- Result) {
+// Scan scans a single port, returning the result into a channel.
+// Scan attempts to establish a TCP connection to the specified host and port
+// using the provided timeout.
+// It returns exactly one Result to results, indicating whether the port is
+// open, closed, timed out, or encountered some other error.
+//
+// The timeout must be positive, the results channel must be writeable.
+func Scan(host string, port int, timeout time.Duration, results chan<- Result) {
 	result := Result{
 		Host: host,
 		Port: port,
 	}
 
-	// create network address
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
 
-	// attempt to make a TCP connection onto addr
 	// note: must have conn var to allow for closing of the connection even
 	//       with _, the connection is still made, just not set to a var
-	conn, err := net.DialTimeout("tcp", addr, timeoutSeconds)
+	conn, err := net.DialTimeout("tcp", addr, timeout)
 	if err != nil {
 		// errors.As() turns err into a netErr
 		var netErr net.Error

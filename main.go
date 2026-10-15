@@ -1,3 +1,4 @@
+// Warren is a network service mapper.
 package main
 
 import (
@@ -13,7 +14,6 @@ import (
 
 const LOGFILE = "warren_log"
 
-// Needs to ask which service to use when more are created
 func main() {
 	// Get args
 	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
@@ -57,6 +57,7 @@ func main() {
 	}
 }
 
+// verifyFlags verifies that all user given flags are allowed by Warren.
 func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
 	// User arg verification
 	if startPort > endPort {
