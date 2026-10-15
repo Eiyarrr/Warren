@@ -15,14 +15,12 @@ import (
 const LOGFILE = "warren_log"
 
 func main() {
-	// Get args
 	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
 	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
 	hostname := flag.String("host", "", "Host to scan")
 	workers := flag.Int("workers", 50, "Number of Go workers to use")
 	timeoutSeconds := flag.Int("timeout", 3, "Seconds before a timeout")
 
-	// Lock in args
 	flag.Parse()
 
 	err := verifyFlags(*startPort, *endPort, *workers, *timeoutSeconds)
@@ -31,7 +29,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Get ledger up and running
 	file, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -59,7 +56,6 @@ func main() {
 
 // verifyFlags verifies that all user given flags are allowed by Warren.
 func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
-	// User arg verification
 	if startPort > endPort {
 		return errors.New("start port cannot be greater than end port")
 	} else if startPort < 0 || endPort > 65535 {

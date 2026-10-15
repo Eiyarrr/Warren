@@ -14,7 +14,6 @@ import (
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
 func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration, scribe ledger.Ledger) error {
-	// Record information attained from user
 	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
 	err := scribe.Record(ledger.Info, message)
 	if err != nil {
@@ -31,7 +30,6 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeout t
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	// Information printed and logged
 	results := beginScanning(startPort, endPort, host, workers, timeout)
 	for _, result := range results {
 		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
@@ -53,7 +51,6 @@ func beginScanning(startPort int, endPort int, host string, workers int, timeout
 
 	var wg sync.WaitGroup
 
-	// spawn the persistent workers immediately
 	for range workers {
 		wg.Add(1)
 		go func() {
@@ -65,7 +62,6 @@ func beginScanning(startPort int, endPort int, host string, workers int, timeout
 		}()
 	}
 
-	// Inside a separate goroutine to prevent blocking from others
 	go func() {
 		for port := startPort; port <= endPort; port++ {
 			jobs <- port
@@ -73,9 +69,7 @@ func beginScanning(startPort int, endPort int, host string, workers int, timeout
 		close(jobs)
 	}()
 
-	// also must be goroutine to prevent blocking
 	go func() {
-		// Wait() waits for all workers to call Done()
 		wg.Wait()
 		close(results)
 	}()
