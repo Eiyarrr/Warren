@@ -12,7 +12,7 @@ import (
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
 )
 
-const LOGFILE = "warren_log"
+const logFile = "warren_log"
 
 func main() {
 	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
@@ -29,7 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	file, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
