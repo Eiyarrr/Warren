@@ -47,10 +47,21 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	err = portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second, *scribe)
+	results, err := portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+
+		message := fmt.Sprintf("Error occurred while scanning: %v", err)
+		err = scribe.Record(ledger.Fatal, message)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
+
 		os.Exit(1)
+	}
+
+	for _, result := range results {
+		fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
 	}
 }
 

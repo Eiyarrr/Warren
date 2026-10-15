@@ -6,51 +6,29 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	ledger "github.com/Eiyarrr/Ledger"
 )
 
 // Portscanner scans the specified host in the inclusive port range using the
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
-func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration, scribe ledger.Ledger) error {
+func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration) ([]Result, error) {
 	if startPort > endPort {
-		return errors.New("start port cannot be greater than end port")
+		return nil, errors.New("start port cannot be greater than end port")
 	} else if startPort < 0 || endPort > 65535 {
-		return errors.New("ports must be between 0 and 65535")
+		return nil, errors.New("ports must be between 0 and 65535")
 	} else if workers <= 0 {
-		return errors.New("worker count must be greater than 0")
+		return nil, errors.New("worker count must be greater than 0")
 	} else if timeout <= 0 {
-		return errors.New("timeout must be greater than 0")
+		return nil, errors.New("timeout must be greater than 0")
 	}
 
-	message := fmt.Sprintf("Port range: %d-%d", startPort, endPort)
-	err := scribe.Record(ledger.Info, message)
-	if err != nil {
-		return err
-	}
-	message = "Hostname/IP: \"" + host + "\""
-	err = scribe.Record(ledger.Info, message)
-	if err != nil {
-		return err
-	}
-	message = "Worker count: " + strconv.Itoa(workers)
-	err = scribe.Record(ledger.Info, message)
-	if err != nil {
-		return err
-	}
+	fmt.Printf("Port range: %d-%d\n", startPort, endPort)
+	fmt.Println("Hostname/IP: \"" + host + "\"")
+	fmt.Println("Worker count: " + strconv.Itoa(workers))
 
 	results := beginScanning(startPort, endPort, host, workers, timeout)
-	for _, result := range results {
-		message := fmt.Sprintf("Host: \"%s\" | Port: %d | Status: %s | Error: %v", result.Host, result.Port, result.Status.String(), result.Err)
-		fmt.Println(message)
-		err := scribe.Record(ledger.Info, message)
-		if err != nil {
-			return err
-		}
-	}
 
-	return nil
+	return results, nil
 }
 
 // beginScanning distributes the specified port range across a worker pool and
