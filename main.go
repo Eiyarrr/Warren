@@ -2,9 +2,11 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
@@ -12,15 +14,19 @@ import (
 )
 
 const logFile = "warren_log"
+const version = "v0.1.0 - DEV"
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Println("Interactive mode is not implemented yet.")
+		err := runInteractive()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 		return
 	}
 
 	switch os.Args[1] {
-
 	case "scan":
 		err := runScan(os.Args[2:])
 		if err != nil {
@@ -34,14 +40,50 @@ func main() {
 		return
 
 	case "version":
-		fmt.Println("v0.1.0 - DEV")
+		fmt.Println(version)
 		return
 
 	default:
 		fmt.Println("Error, unknown command")
 		os.Exit(1)
 	}
+}
 
+func runInteractive() error {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		fmt.Print("warren> ")
+
+		if !scanner.Scan() {
+			err := scanner.Err()
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
+		input := strings.ToLower(strings.TrimSpace(scanner.Text()))
+
+		switch input {
+		case "":
+			continue
+		case "exit":
+			return nil
+		case "version":
+			fmt.Println(version)
+		case "help":
+			fmt.Println("help!")
+		default:
+			fields := strings.Fields(input)
+			if fields[0] == "scan" {
+				err := runScan(fields[1:])
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			}
+		}
+	}
 }
 
 func runScan(args []string) error {
@@ -79,7 +121,7 @@ func runScan(args []string) error {
 		return err
 	}
 
-	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %d\n", *host, *startPort, *endPort, *workers, *timeout)
+	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s\n", *host, *startPort, *endPort, *workers, *timeout)
 	err = scribe.Record(ledger.Info, message)
 	if err != nil {
 		return err
@@ -99,7 +141,7 @@ func runScan(args []string) error {
 
 // verifyFlags verifies that all user given flags are allowed by Warren.
 func verifyFlags(startPort int, endPort int, workers int, timeout time.Duration) error {
-	if startPort > endPort || startPort < 0 || endPort > 65535 {
+	if startPort > endPort || startPort < 0 || endPort > 65535 || startPort > 65535 || endPort < 0 {
 		return portscanner.ErrInvalidPortRange
 	} else if workers <= 0 {
 		return portscanner.ErrInvalidWorkerCount
