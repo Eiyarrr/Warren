@@ -36,7 +36,7 @@ func main() {
 		return
 
 	case "help":
-		fmt.Println("Help!")
+		fmt.Println(helpMessage)
 		return
 
 	case "version":
@@ -73,7 +73,7 @@ func runInteractive() error {
 		case "version":
 			fmt.Println(version)
 		case "help":
-			fmt.Println("help!")
+			fmt.Println(helpMessage)
 		default:
 			fields := strings.Fields(input)
 			if fields[0] == "scan" {
