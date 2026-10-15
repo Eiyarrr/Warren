@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-// Portscanner scans the specified host in the inclusive port range using the
+// ScanRange scans the specified host in the inclusive port range using the
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
-func Portscanner(startPort int, endPort int, host string, workers int, timeout time.Duration) ([]Result, error) {
+func ScanRange(startPort int, endPort int, host string, workers int, timeout time.Duration) ([]Result, error) {
 	if startPort > endPort {
 		return nil, errors.New("start port cannot be greater than end port")
 	} else if startPort < 0 || endPort > 65535 {
@@ -25,6 +25,7 @@ func Portscanner(startPort int, endPort int, host string, workers int, timeout t
 	fmt.Printf("Port range: %d-%d\n", startPort, endPort)
 	fmt.Println("Hostname/IP: \"" + host + "\"")
 	fmt.Println("Worker count: " + strconv.Itoa(workers))
+	fmt.Println("Timeout: " + timeout.String())
 
 	results := beginScanning(startPort, endPort, host, workers, timeout)
 

@@ -47,7 +47,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	results, err := portscanner.Portscanner(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
+	results, err := portscanner.ScanRange(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 
