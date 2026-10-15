@@ -19,6 +19,7 @@ func main() {
 	hostname := flag.String("host", "", "Host to scan")
 	workers := flag.Int("workers", 50, "Number of Go workers to use")
 	timeoutSeconds := flag.Int("timeout", 3, "Seconds before a timeout")
+	common := flag.Bool("common", false, "Scan just the common ports?")
 
 	flag.Parse()
 
@@ -46,7 +47,13 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
-	results, err := portscanner.ScanRange(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
+	var results []portscanner.Result
+	err = nil
+	if *common {
+		results, err = portscanner.ScanCommon(*hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
+	} else {
+		results, err = portscanner.ScanRange(*startPort, *endPort, *hostname, *workers, time.Duration(*timeoutSeconds)*time.Second)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 
