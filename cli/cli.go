@@ -6,13 +6,13 @@ import (
 )
 
 func Run(args []string, version string, logFile string) error {
-	if len(args) == 1 {
-		runInteractive(version, logFile)
+	if len(args) == 0 {
+		return runInteractive(version, logFile)
 	}
 
-	switch args[1] {
+	switch args[0] {
 	case "scan":
-		err := runScan(args[2:], logFile)
+		err := runScan(args[1:], logFile)
 		if err != nil {
 			return err
 		}

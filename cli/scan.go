@@ -33,26 +33,28 @@ func runScan(args []string, logFile string) error {
 		return err
 	}
 
-	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+	if logFile != "" {
+		file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
 
-	scribe, err := ledger.New(file)
-	if err != nil {
-		return err
-	}
+		scribe, err := ledger.New(file)
+		if err != nil {
+			return err
+		}
 
-	err = scribe.Record(ledger.Info, "Ledger loaded!")
-	if err != nil {
-		return err
-	}
+		err = scribe.Record(ledger.Info, "Ledger loaded!")
+		if err != nil {
+			return err
+		}
 
-	message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s\n", *host, *startPort, *endPort, *workers, *timeout)
-	err = scribe.Record(ledger.Info, message)
-	if err != nil {
-		return err
+		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s\n", *host, *startPort, *endPort, *workers, *timeout)
+		err = scribe.Record(ledger.Info, message)
+		if err != nil {
+			return err
+		}
 	}
 
 	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
