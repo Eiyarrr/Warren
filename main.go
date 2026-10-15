@@ -2,7 +2,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -67,14 +66,12 @@ func main() {
 
 // verifyFlags verifies that all user given flags are allowed by Warren.
 func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) error {
-	if startPort > endPort {
-		return errors.New("start port cannot be greater than end port")
-	} else if startPort < 0 || endPort > 65535 {
-		return errors.New("ports must be between 0 and 65535")
+	if startPort > endPort || startPort < 0 || endPort > 65535 {
+		return portscanner.ErrInvalidPortRange
 	} else if workers <= 0 {
-		return errors.New("worker count must be greater than 0")
+		return portscanner.ErrInvalidWorkerCount
 	} else if timeoutSeconds <= 0 {
-		return errors.New("timeout must be greater than 0")
+		return portscanner.ErrInvalidTimeout
 	}
 
 	return nil

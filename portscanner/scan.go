@@ -23,7 +23,7 @@ func Scan(host string, port int, timeout time.Duration, results chan<- Result) {
 
 	if timeout <= 0 {
 		result.Status = Err
-		result.Err = errors.New("timeout must be greater than 0")
+		result.Err = ErrInvalidTimeout
 
 		results <- result
 		return

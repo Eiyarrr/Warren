@@ -1,7 +1,6 @@
 package portscanner
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"sync"
@@ -12,14 +11,12 @@ import (
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
 func ScanRange(startPort int, endPort int, host string, workers int, timeout time.Duration) ([]Result, error) {
-	if startPort > endPort {
-		return nil, errors.New("start port cannot be greater than end port")
-	} else if startPort < 0 || endPort > 65535 {
-		return nil, errors.New("ports must be between 0 and 65535")
+	if startPort > endPort || startPort < 0 || endPort > 65535 {
+		return nil, ErrInvalidPortRange
 	} else if workers <= 0 {
-		return nil, errors.New("worker count must be greater than 0")
+		return nil, ErrInvalidWorkerCount
 	} else if timeout <= 0 {
-		return nil, errors.New("timeout must be greater than 0")
+		return nil, ErrInvalidTimeout
 	}
 
 	fmt.Printf("Port range: %d-%d\n", startPort, endPort)
