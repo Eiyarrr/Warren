@@ -14,6 +14,29 @@ import (
 const logFile = "warren_log"
 
 func main() {
+	if len(os.Args) == 1 {
+		fmt.Println("Interactive mode is not implemented yet.")
+		return
+	}
+
+	switch os.Args[1] {
+	case "scan":
+		err := runScan(os.Args[2:])
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
+		return
+	case "help":
+		fmt.Println("Help!")
+		return
+	case "version":
+		fmt.Println("v0.1.0 - DEV")
+		return
+	default:
+		fmt.Println("Error, unknown command")
+		os.Exit(1)
+	}
+
 	startPort := flag.Int("sPort", 1, "Port to begin scanning with")
 	endPort := flag.Int("ePort", 65535, "Port to end scanning with")
 	hostname := flag.String("host", "", "Host to scan")
@@ -80,6 +103,23 @@ func verifyFlags(startPort int, endPort int, workers int, timeoutSeconds int) er
 	} else if timeoutSeconds <= 0 {
 		return portscanner.ErrInvalidTimeout
 	}
+
+	return nil
+}
+
+func runScan(args []string) error {
+	scanFlags := flag.NewFlagSet("scan", flag.ContinueOnError)
+
+	host := scanFlags.String("host", "127.0.0.1", "Target host")
+	startPort := scanFlags.Int("start-port", 1, "First port in the range")
+	endPort := scanFlags.Int("end-port", 65535, "Last port in the range")
+
+	err := scanFlags.Parse(args)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Host: %s, Start port: %d, End port: %d\n", *host, *startPort, *endPort)
 
 	return nil
 }
