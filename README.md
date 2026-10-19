@@ -12,7 +12,7 @@ Warren is a network service mapper in progress. I created it because I am intere
 
 ## Usage
 Warren is a work in progress, but if you wish to use it, clone the repository, enter its directory, and run `go run .`.
-If you wish to see all allowed parameters, run `go run . --help`.
+If you wish to see all allowed parameters, run `go run . help`.
 
 ## Testing
 To run the test suite for this project, clone the repository, enter its directory, and run `go test ./...`

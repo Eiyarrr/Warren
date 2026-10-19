@@ -14,13 +14,13 @@ import (
 func runScan(args []string, logFile string) error {
 	scanFlags := flag.NewFlagSet("scan", flag.ContinueOnError)
 
-	host := scanFlags.String("host", "127.0.0.1", "Target host")
-	startPort := scanFlags.Int("start-port", 1, "First port in the range")
-	endPort := scanFlags.Int("end-port", 1024, "Last port in the range")
-	workers := scanFlags.Int("workers", 50, "Number of Go workers to use")
-	timeout := scanFlags.Duration("timeout", 3*time.Second, "Time before scanner assumes a timeout")
-	common := scanFlags.Bool("common", false, "Whether only the common ports should be scanned")
-	openOnly := scanFlags.Bool("open-only", false, "Whether to only print the open ports")
+	host := scanFlags.String("host", "127.0.0.1", "Host to scan")
+	startPort := scanFlags.Int("start-port", 1, "First port to scan")
+	endPort := scanFlags.Int("end-port", 1024, "Last port to scan")
+	workers := scanFlags.Int("workers", 50, "Number of concurrent workers")
+	timeout := scanFlags.Duration("timeout", 3*time.Second, "Maximum time to wait for a connection attempt")
+	common := scanFlags.Bool("common", false, "Scan only common ports")
+	openOnly := scanFlags.Bool("open-only", false, "Display only open ports")
 
 	err := scanFlags.Parse(args)
 	if errors.Is(err, flag.ErrHelp) {
