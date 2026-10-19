@@ -51,6 +51,11 @@ func runScan(args []string, logFile string) error {
 			return err
 		}
 
+		fmt.Printf("Port range: %d-%d\n", startPort, endPort)
+		fmt.Printf("Hostname/IP: %q\n", *host)
+		fmt.Printf("Worker count: %d\n", *workers)
+		fmt.Printf("Timeout: %s", timeout.String())
+
 		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s\n", *host, *startPort, *endPort, *workers, *timeout)
 		err = scribe.Record(ledger.Info, message)
 		if err != nil {

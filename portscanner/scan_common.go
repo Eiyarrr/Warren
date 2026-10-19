@@ -1,8 +1,6 @@
 package portscanner
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 	"sync"
 )
@@ -13,10 +11,6 @@ func ScanCommon(host string, workers int, timeout time.Duration) ([]Result, erro
 	} else if timeout <= 0 {
 		return nil, ErrInvalidTimeout
 	}
-
-	fmt.Println("Hostname/IP: \"" + host + "\"")
-	fmt.Println("Worker count: " + strconv.Itoa(workers))
-	fmt.Println("Timeout: " + timeout.String())
 
 	jobs := make(chan int)
 	results := make(chan Result)

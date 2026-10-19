@@ -1,8 +1,6 @@
 package portscanner
 
 import (
-	"fmt"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -11,7 +9,6 @@ import (
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
 func ScanRange(startPort int, endPort int, common bool, host string, workers int, timeout time.Duration) ([]Result, error) {
-
 	if common {
 		return ScanCommon(host, workers, timeout)
 	}
@@ -23,11 +20,6 @@ func ScanRange(startPort int, endPort int, common bool, host string, workers int
 	} else if timeout <= 0 {
 		return nil, ErrInvalidTimeout
 	}
-
-	fmt.Printf("Port range: %d-%d\n", startPort, endPort)
-	fmt.Println("Hostname/IP: \"" + host + "\"")
-	fmt.Println("Worker count: " + strconv.Itoa(workers))
-	fmt.Println("Timeout: " + timeout.String())
 
 	results := beginScanning(startPort, endPort, host, workers, timeout)
 
