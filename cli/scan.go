@@ -19,6 +19,7 @@ func runScan(args []string, logFile string) error {
 	endPort := scanFlags.Int("end-port", 1024, "Last port in the range")
 	workers := scanFlags.Int("workers", 50, "Number of Go workers to use")
 	timeout := scanFlags.Duration("timeout", 3*time.Second, "Time before scanner assumes a timeout")
+	common := scanFlags.Bool("common", false, "Whether only the common ports should be scanned")
 
 	err := scanFlags.Parse(args)
 	if errors.Is(err, flag.ErrHelp) {
@@ -57,7 +58,7 @@ func runScan(args []string, logFile string) error {
 		}
 	}
 
-	results, err := portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
+	results, err := portscanner.ScanRange(*startPort, *endPort, *common, *host, *workers, *timeout)
 	if err != nil {
 		return err
 	}

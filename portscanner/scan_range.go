@@ -10,7 +10,12 @@ import (
 // ScanRange scans the specified host in the inclusive port range using the
 // given number of workers and timeout.
 // Each result is printed to the console and logged using Ledger.
-func ScanRange(startPort int, endPort int, host string, workers int, timeout time.Duration) ([]Result, error) {
+func ScanRange(startPort int, endPort int, common bool, host string, workers int, timeout time.Duration) ([]Result, error) {
+
+	if common {
+		return ScanCommon(host, workers, timeout)
+	}
+
 	if startPort > endPort || startPort < 0 || endPort > 65535 {
 		return nil, ErrInvalidPortRange
 	} else if workers <= 0 {
