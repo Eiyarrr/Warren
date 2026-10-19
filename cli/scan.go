@@ -20,6 +20,7 @@ func runScan(args []string, logFile string) error {
 	workers := scanFlags.Int("workers", 50, "Number of Go workers to use")
 	timeout := scanFlags.Duration("timeout", 3*time.Second, "Time before scanner assumes a timeout")
 	common := scanFlags.Bool("common", false, "Whether only the common ports should be scanned")
+	openOnly := scanFlags.Bool("open-only", false, "Whether to only print the open ports")
 
 	err := scanFlags.Parse(args)
 	if errors.Is(err, flag.ErrHelp) {
@@ -56,8 +57,9 @@ func runScan(args []string, logFile string) error {
 		fmt.Printf("Worker count: %d\n", *workers)
 		fmt.Printf("Timeout: %s\n", timeout.String())
 		fmt.Print("Common?: ", *common)
+		fmt.Print("OpenOnly?: ", *openOnly)
 
-		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s, Common?: %v\n", *host, *startPort, *endPort, *workers, *timeout, *common)
+		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s, Common?: %v, OpenOnly?: %v\n", *host, *startPort, *endPort, *workers, *timeout, *common, *openOnly)
 		err = scribe.Record(ledger.Info, message)
 		if err != nil {
 			return err
@@ -69,8 +71,16 @@ func runScan(args []string, logFile string) error {
 		return err
 	}
 
-	for _, result := range results {
-		fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+	if *openOnly {
+		for _, result := range results {
+			if result.Status == portscanner.Open {
+				fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+			}
+		}
+	} else {
+		for _, result := range results {
+			fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+		}
 	}
 
 	return nil
