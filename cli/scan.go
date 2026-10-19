@@ -56,7 +56,7 @@ func runScan(args []string, logFile string) error {
 		fmt.Printf("Hostname/IP: %q\n", *host)
 		fmt.Printf("Worker count: %d\n", *workers)
 		fmt.Printf("Timeout: %s\n", timeout.String())
-		fmt.Print("Common?: ", *common)
+		fmt.Printf("Common?: %v\n", *common)
 		fmt.Print("OpenOnly?: ", *openOnly)
 
 		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s, Common?: %v, OpenOnly?: %v\n", *host, *startPort, *endPort, *workers, *timeout, *common, *openOnly)
