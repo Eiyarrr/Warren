@@ -1,8 +1,8 @@
 package portscanner
 
 import (
-	"time"
 	"sync"
+	"time"
 )
 
 func ScanCommon(host string, workers int, timeout time.Duration) ([]Result, error) {
@@ -18,14 +18,11 @@ func ScanCommon(host string, workers int, timeout time.Duration) ([]Result, erro
 	var wg sync.WaitGroup
 
 	for range workers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
+		wg.Go(func() {
 			for job := range jobs {
 				Scan(host, job, timeout, results)
 			}
-		}()
+		})
 	}
 
 	go func() {

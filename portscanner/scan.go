@@ -39,14 +39,11 @@ func beginScanning(startPort int, endPort int, host string, workers int, timeout
 	var wg sync.WaitGroup
 
 	for range workers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
+		wg.Go(func() {
 			for job := range jobs {
 				Scan(host, job, timeout, results)
 			}
-		}()
+		})
 	}
 
 	go func() {
