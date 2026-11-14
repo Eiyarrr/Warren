@@ -11,7 +11,7 @@ func runInteractive(version string, logFile string) error {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		fmt.Print("warren> ")
+		fmt.Print("warren > ")
 
 		if !scanner.Scan() {
 			err := scanner.Err()

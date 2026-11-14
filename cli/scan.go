@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
@@ -37,7 +36,7 @@ func runScan(args []string, logFile string) error {
 	}
 
 	if logFile != "" {
-		file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 		if err != nil {
 			return err
 		}
@@ -67,11 +66,9 @@ func runScan(args []string, logFile string) error {
 		}
 	}
 
-
-	var results = []portscanner.Result{}
+	results := []portscanner.Result{}
 	if *common {
 		results, err = portscanner.ScanCommon(*host, *workers, *timeout)
-
 	} else {
 		results, err = portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
 		if err != nil {
@@ -79,28 +76,7 @@ func runScan(args []string, logFile string) error {
 		}
 	}
 
-	if *openOnly {
-		for _, result := range results {
-			port := strconv.Itoa(result.Port)
-			commonPort, ok := portscanner.CommonPorts[result.Port] 
-			if ok {
-				port = fmt.Sprint(port, " / ", commonPort)
-			}
-
-			if result.Status == portscanner.Open {
-				fmt.Printf("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, port, result.Status.String(), result.Err)
-			}
-		}
-	} else {
-		for _, result := range results {
-			port := strconv.Itoa(result.Port)
-			commonPort, ok := portscanner.CommonPorts[result.Port] 
-			if ok {
-				port = fmt.Sprint(port, " / ", commonPort)
-			}
-			fmt.Printf("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, port, result.Status.String(), result.Err)
-		}
-	}
+	printResults(results, *openOnly)
 
 	return nil
 }
