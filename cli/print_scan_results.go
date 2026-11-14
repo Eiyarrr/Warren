@@ -12,6 +12,8 @@ import (
 )
 
 func printResults(results []portscanner.Result, openOnly bool) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.TabIndent)
+
 	colorOpen := color.New(color.FgGreen).SprintFunc()
 	colorTimeout := color.New(color.FgYellow).SprintFunc()
 	colorClosed := color.New(color.FgHiBlack).SprintFunc()
@@ -36,9 +38,11 @@ func printResults(results []portscanner.Result, openOnly bool) {
 			statusColor = color.New(color.FgWhite).SprintFunc()
 		}
 
-		message := fmt.Sprintf("Host: %q | Port: %d | Status: %s | Error: %v", result.Host, result.Port, statusColor(result.Status.String()), result.Err)
-		fmt.Println(message)
+		message := fmt.Sprintf("Host: %q\tPort: %d\tStatus: %s\tError: %v\t", result.Host, result.Port, statusColor(result.Status.String()), result.Err)
+		fmt.Fprintln(w, message)
 	}
+
+	w.Flush()
 }
 
 func printHeader(target string, workers int, timeout time.Duration) {
