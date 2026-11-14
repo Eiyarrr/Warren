@@ -2,6 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
 	"time"
 
 	color "github.com/fatih/color"
@@ -12,11 +14,15 @@ import (
 func printResults(results []portscanner.Result, openOnly bool) {
 	colorOpen := color.New(color.FgGreen).SprintFunc()
 	colorTimeout := color.New(color.FgYellow).SprintFunc()
-	colorClosed := color.New(color.FgBlue).SprintFunc()
+	colorClosed := color.New(color.FgHiBlack).SprintFunc()
 	colorErr := color.New(color.FgRed).SprintFunc()
 
 	statusColor := color.New().SprintFunc()
 	for _, result := range results {
+		if openOnly && !(result.Status == portscanner.Open) {
+			continue
+		}
+
 		switch result.Status {
 		case portscanner.Open:
 			statusColor = colorOpen
@@ -30,38 +36,17 @@ func printResults(results []portscanner.Result, openOnly bool) {
 			statusColor = color.New(color.FgWhite).SprintFunc()
 		}
 
-		message := statusColor("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+		message := fmt.Sprintf("Host: %q | Port: %d | Status: %s | Error: %v", result.Host, result.Port, statusColor(result.Status.String()), result.Err)
 		fmt.Println(message)
 	}
-
-	/*
-		if openOnly {
-			for _, result := range results {
-				port := strconv.Itoa(result.Port)
-				commonPort, ok := portscanner.CommonPorts[result.Port]
-				if ok {
-					port = fmt.Sprint(port, " / ", commonPort)
-				}
-
-				if result.Status == portscanner.Open {
-					fmt.Printf("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, port, result.Status.String(), result.Err)
-				}
-			}
-		} else {
-			for _, result := range results {
-				port := strconv.Itoa(result.Port)
-				commonPort, ok := portscanner.CommonPorts[result.Port]
-				if ok {
-					port = fmt.Sprint(port, " / ", commonPort)
-				}
-				fmt.Printf("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, port, result.Status.String(), result.Err)
-			}
-		}
-	*/
 }
 
 func printHeader(target string, workers int, timeout time.Duration) {
-	fmt.Println(target)
-	fmt.Println(workers)
-	fmt.Println(timeout)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
+
+	fmt.Fprintln(w, "TARGET \t", target)
+	fmt.Fprintln(w, "WORKERS \t", workers)
+	fmt.Fprintln(w, "TIMEOUT \t", timeout)
+
+	w.Flush()
 }
