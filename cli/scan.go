@@ -52,12 +52,12 @@ func runScan(args []string, logFile string) error {
 			return err
 		}
 
-		fmt.Printf("Port range: %d-%d\n", startPort, endPort)
+		fmt.Printf("Port range: %d-%d\n", *startPort, *endPort)
 		fmt.Printf("Hostname/IP: %q\n", *host)
 		fmt.Printf("Worker count: %d\n", *workers)
 		fmt.Printf("Timeout: %s\n", timeout.String())
 		fmt.Printf("Common?: %v\n", *common)
-		fmt.Print("OpenOnly?: ", *openOnly)
+		fmt.Printf("OpenOnly?: %v\n", *openOnly)
 
 		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s, Common?: %v, OpenOnly?: %v\n", *host, *startPort, *endPort, *workers, *timeout, *common, *openOnly)
 		err = scribe.Record(ledger.Info, message)
@@ -66,9 +66,16 @@ func runScan(args []string, logFile string) error {
 		}
 	}
 
-	results, err := portscanner.ScanRange(*startPort, *endPort, *common, *host, *workers, *timeout)
-	if err != nil {
-		return err
+
+	var results = []portscanner.Result{}
+	if *common {
+		results, err = portscanner.ScanCommon(*host, *workers, *timeout)
+
+	} else {
+		results, err = portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
+		if err != nil {
+			return err
+		}
 	}
 
 	if *openOnly {
