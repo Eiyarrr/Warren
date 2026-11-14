@@ -26,7 +26,7 @@ func ScanCommon(host string, workers int, timeout time.Duration) ([]Result, erro
 	}
 
 	go func() {
-		for port := range commonPorts {
+		for port := range CommonPorts {
 			jobs <- port
 		}
 		close(jobs)

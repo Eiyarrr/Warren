@@ -1,7 +1,7 @@
 package portscanner
 
 // Ports that may be revealed from commonly used services.
-var commonPorts = map[int]string{
+var CommonPorts = map[int]string{
 	20:    "FTP data",
 	21:    "FTP control",
 	22:    "SSH",

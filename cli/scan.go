@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	ledger "github.com/Eiyarrr/Ledger"
@@ -80,13 +81,24 @@ func runScan(args []string, logFile string) error {
 
 	if *openOnly {
 		for _, result := range results {
+			port := strconv.Itoa(result.Port)
+			commonPort, ok := portscanner.CommonPorts[result.Port] 
+			if ok {
+				port = fmt.Sprint(port, " / ", commonPort)
+			}
+
 			if result.Status == portscanner.Open {
-				fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+				fmt.Printf("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, port, result.Status.String(), result.Err)
 			}
 		}
 	} else {
 		for _, result := range results {
-			fmt.Printf("Host: \"%s\" | Port: %d | Status: %s | Error: %v\n", result.Host, result.Port, result.Status.String(), result.Err)
+			port := strconv.Itoa(result.Port)
+			commonPort, ok := portscanner.CommonPorts[result.Port] 
+			if ok {
+				port = fmt.Sprint(port, " / ", commonPort)
+			}
+			fmt.Printf("Host: \"%s\" | Port: %s | Status: %s | Error: %v\n", result.Host, port, result.Status.String(), result.Err)
 		}
 	}
 
