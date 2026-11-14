@@ -3,15 +3,12 @@ package cli
 import (
 	"errors"
 	"flag"
-	"fmt"
-	"os"
 	"time"
 
-	ledger "github.com/Eiyarrr/Ledger"
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
 )
 
-func runScan(args []string, logFile string) error {
+func runScan(args []string) error {
 	scanFlags := flag.NewFlagSet("scan", flag.ContinueOnError)
 
 	host := scanFlags.String("host", "127.0.0.1", "Host to scan")
@@ -35,37 +32,6 @@ func runScan(args []string, logFile string) error {
 		return err
 	}
 
-	if logFile != "" {
-		file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		scribe, err := ledger.New(file)
-		if err != nil {
-			return err
-		}
-
-		err = scribe.Record(ledger.Info, "Ledger loaded!")
-		if err != nil {
-			return err
-		}
-
-		fmt.Printf("Port range: %d-%d\n", *startPort, *endPort)
-		fmt.Printf("Hostname/IP: %q\n", *host)
-		fmt.Printf("Worker count: %d\n", *workers)
-		fmt.Printf("Timeout: %s\n", timeout.String())
-		fmt.Printf("Common?: %v\n", *common)
-		fmt.Printf("OpenOnly?: %v\n", *openOnly)
-
-		message := fmt.Sprintf("Host: %s, Start port: %d, End port: %d, Worker count: %d, Timeout: %s, Common?: %v, OpenOnly?: %v\n", *host, *startPort, *endPort, *workers, *timeout, *common, *openOnly)
-		err = scribe.Record(ledger.Info, message)
-		if err != nil {
-			return err
-		}
-	}
-
 	results := []portscanner.Result{}
 	if *common {
 		results, err = portscanner.ScanCommon(*host, *workers, *timeout)
@@ -76,6 +42,7 @@ func runScan(args []string, logFile string) error {
 		}
 	}
 
+	printHeader(*host, *workers, *timeout)
 	printResults(results, *openOnly)
 
 	return nil

@@ -5,14 +5,14 @@ import (
 	"fmt"
 )
 
-func Run(args []string, version string, logFile string) error {
+func Run(args []string, version string) error {
 	if len(args) == 0 {
-		return runInteractive(version, logFile)
+		return runInteractive(version)
 	}
 
 	switch args[0] {
 	case "scan":
-		err := runScan(args[1:], logFile)
+		err := runScan(args[1:])
 		if err != nil {
 			return err
 		}

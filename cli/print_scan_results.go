@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"time"
 
 	color "github.com/fatih/color"
 
@@ -57,4 +58,10 @@ func printResults(results []portscanner.Result, openOnly bool) {
 			}
 		}
 	*/
+}
+
+func printHeader(target string, workers int, timeout time.Duration) {
+	fmt.Println(target)
+	fmt.Println(workers)
+	fmt.Println(timeout)
 }

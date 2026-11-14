@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func runInteractive(version string, logFile string) error {
+func runInteractive(version string) error {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -35,7 +35,7 @@ func runInteractive(version string, logFile string) error {
 		default:
 			fields := strings.Fields(input)
 			if fields[0] == "scan" {
-				err := runScan(fields[1:], logFile)
+				err := runScan(fields[1:])
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 				}
