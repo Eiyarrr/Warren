@@ -29,11 +29,13 @@ func GrabBanner(host string, port int, timeout time.Duration, maxBytes int) (str
 		return "", false, err
 	}
 
-	buf := make([]byte, maxBytes)
+	buf := make([]byte, maxBytes+1)
 	totalWritten := 0
 	for {
 		// truncation is not an error, needs a new way to find
 		n, err := conn.Read(buf[totalWritten:])
+		totalWritten += n
+
 		if err != nil {
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
@@ -45,14 +47,21 @@ func GrabBanner(host string, port int, timeout time.Duration, maxBytes int) (str
 			return "", false, err
 		}
 
-		totalWritten += n
-
-		if totalWritten >= maxBytes {
+		if totalWritten > maxBytes {
 			break
 		}
+
+		if n == 0 {
+			break
+		}
+	}
+	truncate := false
+	if totalWritten > maxBytes {
+		truncate = true
+		totalWritten--
 	}
 
 	banner := string(buf[:totalWritten])
 
-	return banner, false, nil
+	return banner, truncate, nil
 }

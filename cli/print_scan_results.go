@@ -8,7 +8,7 @@ import (
 
 	color "github.com/fatih/color"
 
-	"github.com/Eiyarrr/Warren/bannergrabber"
+	bannergrabber "github.com/Eiyarrr/Warren/bannergrabber"
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
 )
 
@@ -24,7 +24,7 @@ func printResults(results []portscanner.Result, openOnly bool) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.TabIndent)
 
 	fmt.Println()
-	fmt.Fprintln(w, "HOST\tPORT\tSTATUS\tERROR")
+	fmt.Fprintln(w, "HOST\tPORT\tSTATUS\tERROR\tBANNER")
 
 	for _, result := range results {
 		if openOnly && result.Status != portscanner.Open {
@@ -36,6 +36,7 @@ func printResults(results []portscanner.Result, openOnly bool) {
 			errMsg = result.Err.Error()
 		}
 
+		banner := "=="
 		banner, _, err := bannergrabber.GrabBanner(result.Host, result.Port, 3*time.Second, 4000)
 		if err != nil {
 			fmt.Println(err)
