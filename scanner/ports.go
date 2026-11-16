@@ -1,4 +1,4 @@
-package portscanner
+package scanner
 
 // Ports that may be revealed from commonly used services.
 var CommonPorts = map[int]string{

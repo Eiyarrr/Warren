@@ -1,4 +1,4 @@
-package portscanner_test
+package scanner_test
 
 import (
 	"net"
@@ -7,7 +7,7 @@ import (
 	"time"
 	"fmt"
 
-	"github.com/Eiyarrr/Warren/portscanner"
+	scanner "github.com/Eiyarrr/Warren/scanner"
 )
 
 func TestOpenPort(t *testing.T) {
@@ -24,9 +24,9 @@ func TestOpenPort(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	result := portscanner.Scan(host, port, 3*time.Second)
-	if result.Status != portscanner.Open {
-		t.Fatalf("expected status %q, got %q", portscanner.Open, result.Status)
+	result := scanner.Scan(host, port, 3*time.Second)
+	if result.Status != scanner.Open {
+		t.Fatalf("expected status %q, got %q", scanner.Open, result.Status)
 	}
 }
 
@@ -47,9 +47,9 @@ func TestClosedPort(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to close listener: %v", err)
 	}
-	result := portscanner.Scan(host, port, 3*time.Second)
-	if result.Status != portscanner.Closed {
-		t.Fatalf("expected status %q, got %q", portscanner.Closed, result.Status)
+	result := scanner.Scan(host, port, 3*time.Second)
+	if result.Status != scanner.Closed {
+		t.Fatalf("expected status %q, got %q", scanner.Closed, result.Status)
 	}
 }
 

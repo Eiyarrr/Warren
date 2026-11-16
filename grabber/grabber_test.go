@@ -1,4 +1,4 @@
-package bannergrabber_test
+package grabber_test
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	bannergrabber "github.com/Eiyarrr/Warren/bannergrabber"
+	grabber "github.com/Eiyarrr/Warren/grabber"
 )
 
 func TestNoSend(t *testing.T) {
@@ -27,7 +27,7 @@ func TestNoSend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, _, err = bannergrabber.GrabBanner(host, port, timeout, maxBytes)
+	_, _, err = grabber.GrabBanner(host, port, timeout, maxBytes)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -80,7 +80,7 @@ func TestNormal(t *testing.T) {
 		errChan <- nil
 	}()
 
-	banner, truncated, err := bannergrabber.GrabBanner(host, port, timeout, maxBytes)
+	banner, truncated, err := grabber.GrabBanner(host, port, timeout, maxBytes)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -129,7 +129,7 @@ func TestInstantClose(t *testing.T) {
 		errChan <- nil
 	}()
 
-	banner, truncated, err := bannergrabber.GrabBanner(host, port, timeout, maxBytes)
+	banner, truncated, err := grabber.GrabBanner(host, port, timeout, maxBytes)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -193,7 +193,7 @@ func TestTruncation(t *testing.T) {
 		errChan <- nil
 	}()
 
-	banner, truncated, err := bannergrabber.GrabBanner(host, port, timeout, maxBytes)
+	banner, truncated, err := grabber.GrabBanner(host, port, timeout, maxBytes)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

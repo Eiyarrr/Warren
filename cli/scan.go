@@ -5,7 +5,7 @@ import (
 	"flag"
 	"time"
 
-	portscanner "github.com/Eiyarrr/Warren/portscanner"
+	scanner "github.com/Eiyarrr/Warren/scanner"
 )
 
 func runScan(args []string) error {
@@ -32,11 +32,11 @@ func runScan(args []string) error {
 		return err
 	}
 
-	results := []portscanner.Result{}
+	results := []scanner.Result{}
 	if *common {
-		results, err = portscanner.ScanCommon(*host, *workers, *timeout)
+		results, err = scanner.ScanCommon(*host, *workers, *timeout)
 	} else {
-		results, err = portscanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
+		results, err = scanner.ScanRange(*startPort, *endPort, *host, *workers, *timeout)
 		if err != nil {
 			return err
 		}
@@ -50,11 +50,11 @@ func runScan(args []string) error {
 
 func verifyScanFlags(startPort int, endPort int, workers int, timeout time.Duration) error {
 	if startPort > endPort || startPort < 0 || endPort > 65535 || startPort > 65535 || endPort < 0 {
-		return portscanner.ErrInvalidPortRange
+		return scanner.ErrInvalidPortRange
 	} else if workers <= 0 {
-		return portscanner.ErrInvalidWorkerCount
+		return scanner.ErrInvalidWorkerCount
 	} else if timeout <= 0 {
-		return portscanner.ErrInvalidTimeout
+		return scanner.ErrInvalidTimeout
 	}
 
 	return nil

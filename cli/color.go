@@ -3,7 +3,7 @@ package cli
 import (
 	color "github.com/fatih/color"
 
-	portscanner "github.com/Eiyarrr/Warren/portscanner"
+	scanner "github.com/Eiyarrr/Warren/scanner"
 )
 
 var (
@@ -14,15 +14,15 @@ var (
 	colorDefault = color.New(color.FgWhite).SprintFunc()
 )
 
-func getStatusColor(status portscanner.Status) func(a ...any) string {
+func getStatusColor(status scanner.Status) func(a ...any) string {
 	switch status {
-	case portscanner.Open:
+	case scanner.Open:
 		return colorOpen
-	case portscanner.Timeout:
+	case scanner.Timeout:
 		return colorTimeout
-	case portscanner.Closed:
+	case scanner.Closed:
 		return colorClosed
-	case portscanner.Err:
+	case scanner.Err:
 		return colorErr
 	default:
 		return colorDefault

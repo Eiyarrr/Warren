@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Eiyarrr/Warren/cli"
-	"github.com/Eiyarrr/Warren/portscanner"
+	cli "github.com/Eiyarrr/Warren/cli"
+	scanner "github.com/Eiyarrr/Warren/scanner"
 )
 
 func TestRunScan(t *testing.T) {
@@ -21,8 +21,8 @@ func TestInvalidPorts(t *testing.T) {
 	args := []string{"scan", "-start-port", "100", "-end-port", "90"}
 
 	err := cli.Run(args, "")
-	if !errors.Is(err, portscanner.ErrInvalidPortRange) {
-		t.Fatalf("expected %v, got %v", portscanner.ErrInvalidPortRange, err)
+	if !errors.Is(err, scanner.ErrInvalidPortRange) {
+		t.Fatalf("expected %v, got %v", scanner.ErrInvalidPortRange, err)
 	}
 }
 
@@ -30,8 +30,8 @@ func TestInvalidWorkerCount(t *testing.T) {
 	args := []string{"scan", "-workers", "-10"}
 
 	err := cli.Run(args, "")
-	if !errors.Is(err, portscanner.ErrInvalidWorkerCount) {
-		t.Fatalf("expected %v, got %v", portscanner.ErrInvalidWorkerCount, err)
+	if !errors.Is(err, scanner.ErrInvalidWorkerCount) {
+		t.Fatalf("expected %v, got %v", scanner.ErrInvalidWorkerCount, err)
 	}
 }
 
@@ -39,8 +39,8 @@ func TestInvalidTimeout(t *testing.T) {
 	args := []string{"scan", "-timeout", "-1s"}
 
 	err := cli.Run(args, "")
-	if !errors.Is(err, portscanner.ErrInvalidTimeout) {
-		t.Fatalf("expected %v, got %v", portscanner.ErrInvalidTimeout, err)
+	if !errors.Is(err, scanner.ErrInvalidTimeout) {
+		t.Fatalf("expected %v, got %v", scanner.ErrInvalidTimeout, err)
 	}
 }
 

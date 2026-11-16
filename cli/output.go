@@ -6,18 +6,18 @@ import (
 	"text/tabwriter"
 	"time"
 
-	bannergrabber "github.com/Eiyarrr/Warren/bannergrabber"
-	portscanner "github.com/Eiyarrr/Warren/portscanner"
+	grabber "github.com/Eiyarrr/Warren/grabber"
+	scanner "github.com/Eiyarrr/Warren/scanner"
 )
 
-func printResults(results []portscanner.Result, openOnly bool) {
+func printResults(results []scanner.Result, openOnly bool) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.TabIndent)
 
 	fmt.Println()
 	fmt.Fprintln(w, "HOST\tPORT\tSTATUS\tERROR\tBANNER")
 
 	for _, result := range results {
-		if openOnly && result.Status != portscanner.Open {
+		if openOnly && result.Status != scanner.Open {
 			continue
 		}
 
@@ -27,7 +27,7 @@ func printResults(results []portscanner.Result, openOnly bool) {
 		}
 
 		banner := "=="
-		banner, _, err := bannergrabber.GrabBanner(result.Host, result.Port, 3*time.Second, 4000)
+		banner, _, err := grabber.GrabBanner(result.Host, result.Port, 3*time.Second, 4000)
 		if err != nil {
 			fmt.Println(err)
 		}

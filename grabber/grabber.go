@@ -1,4 +1,4 @@
-package bannergrabber
+package grabber
 
 import (
 	"errors"

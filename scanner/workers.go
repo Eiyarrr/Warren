@@ -1,4 +1,4 @@
-package portscanner
+package scanner
 
 import (
 	"sync"
