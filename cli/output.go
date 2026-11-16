@@ -6,18 +6,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	color "github.com/fatih/color"
-
 	bannergrabber "github.com/Eiyarrr/Warren/bannergrabber"
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
-)
-
-var (
-	colorOpen    = color.New(color.FgGreen).SprintFunc()
-	colorTimeout = color.New(color.FgYellow).SprintFunc()
-	colorClosed  = color.New(color.FgHiBlack).SprintFunc()
-	colorErr     = color.New(color.FgRed).SprintFunc()
-	colorDefault = color.New(color.FgWhite).SprintFunc()
 )
 
 func printResults(results []portscanner.Result, openOnly bool) {
@@ -47,21 +37,6 @@ func printResults(results []portscanner.Result, openOnly bool) {
 	}
 
 	w.Flush()
-}
-
-func getStatusColor(status portscanner.Status) func(a ...any) string {
-	switch status {
-	case portscanner.Open:
-		return colorOpen
-	case portscanner.Timeout:
-		return colorTimeout
-	case portscanner.Closed:
-		return colorClosed
-	case portscanner.Err:
-		return colorErr
-	default:
-		return colorDefault
-	}
 }
 
 func printHeader(target string, workers int, timeout time.Duration) {
