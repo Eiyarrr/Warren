@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"fmt"
 
 	"github.com/Eiyarrr/Warren/portscanner"
 )
@@ -18,19 +19,12 @@ func TestOpenPort(t *testing.T) {
 	defer listener.Close()
 
 	addr := listener.Addr().String()
-
-	host, portStr, err := net.SplitHostPort(addr)
+	host, port, err := splitAddr(addr)
 	if err != nil {
-		t.Fatalf("failed to split listener address: %v", err)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
+		t.Fatal(err)
 	}
 
 	result := portscanner.Scan(host, port, 3*time.Second)
-
 	if result.Status != portscanner.Open {
 		t.Fatalf("expected status %q, got %q", portscanner.Open, result.Status)
 	}
@@ -44,23 +38,31 @@ func TestClosedPort(t *testing.T) {
 	}
 
 	addr := listener.Addr().String()
+	host, port, err := splitAddr(addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	err = listener.Close()
 	if err != nil {
 		t.Fatalf("failed to close listener: %v", err)
 	}
-
-	host, portStr, err := net.SplitHostPort(addr)
-	if err != nil {
-		t.Fatalf("failed to split listener address: %v", err)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
-	}
-
 	result := portscanner.Scan(host, port, 3*time.Second)
 	if result.Status != portscanner.Closed {
 		t.Fatalf("expected status %q, got %q", portscanner.Closed, result.Status)
 	}
+}
+
+func splitAddr(addr string) (string, int, error) {
+	host, portStr, err := net.SplitHostPort(addr)
+	if err != nil {
+		return host, 0, fmt.Errorf("failed to parse port: %v", err)
+	}
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return host, port, fmt.Errorf("failed to parse port: %v", err)
+	}
+
+	return host, port, err
 }
