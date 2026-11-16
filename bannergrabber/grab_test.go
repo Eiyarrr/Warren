@@ -22,15 +22,9 @@ func TestNoSend(t *testing.T) {
 	defer listener.Close()
 
 	addr := listener.Addr().String()
-
-	host, portStr, err := net.SplitHostPort(addr)
+	host, port, err := splitAddr(addr)
 	if err != nil {
-		t.Fatalf("failed to split listener address: %v", err)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
+		t.Fatal(err)
 	}
 
 	_, _, err = bannergrabber.GrabBanner(host, port, timeout, maxBytes)
@@ -51,15 +45,9 @@ func TestNormal(t *testing.T) {
 	defer listener.Close()
 
 	addr := listener.Addr().String()
-
-	host, portStr, err := net.SplitHostPort(addr)
+	host, port, err := splitAddr(addr)
 	if err != nil {
-		t.Fatalf("failed to split listener address: %v", err)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
+		t.Fatal(err)
 	}
 
 	testBanner := "TEST BANNER"
@@ -121,15 +109,9 @@ func TestInstantClose(t *testing.T) {
 	defer listener.Close()
 
 	addr := listener.Addr().String()
-
-	host, portStr, err := net.SplitHostPort(addr)
+	host, port, err := splitAddr(addr)
 	if err != nil {
-		t.Fatalf("failed to split listener address: %v", err)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
+		t.Fatal(err)
 	}
 
 	errChan := make(chan error, 1)
@@ -176,15 +158,9 @@ func TestTruncation(t *testing.T) {
 	defer listener.Close()
 
 	addr := listener.Addr().String()
-
-	host, portStr, err := net.SplitHostPort(addr)
+	host, port, err := splitAddr(addr)
 	if err != nil {
-		t.Fatalf("failed to split listener address: %v", err)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		t.Fatalf("failed to parse port: %v", err)
+		t.Fatal(err)
 	}
 
 	testBanner := string(make([]byte, maxBytes+1))
@@ -232,4 +208,18 @@ func TestTruncation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func splitAddr(addr string) (string, int, error) {
+	host, portStr, err := net.SplitHostPort(addr)
+	if err != nil {
+		return host, 0, fmt.Errorf("failed to parse port: %v", err)
+	}
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return host, port, fmt.Errorf("failed to parse port: %v", err)
+	}
+
+	return host, port, err
 }
