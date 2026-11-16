@@ -8,6 +8,7 @@ import (
 
 	color "github.com/fatih/color"
 
+	"github.com/Eiyarrr/Warren/bannergrabber"
 	portscanner "github.com/Eiyarrr/Warren/portscanner"
 )
 
@@ -35,8 +36,13 @@ func printResults(results []portscanner.Result, openOnly bool) {
 			errMsg = result.Err.Error()
 		}
 
+		banner, _, err := bannergrabber.GrabBanner(result.Host, result.Port, 3*time.Second, 4000)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		coloredStatus := getStatusColor(result.Status)(result.Status.String())
-		fmt.Fprintf(w, "%s\t%d\t%s\t%s%s\n", result.Host, result.Port, coloredStatus, "         ", errMsg)
+		fmt.Fprintf(w, "%s\t%d\t%s\t%s%s\t%s\n", result.Host, result.Port, coloredStatus, "         ", errMsg, banner)
 	}
 
 	w.Flush()
