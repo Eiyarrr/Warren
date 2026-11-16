@@ -12,18 +12,17 @@ func ScanCommon(host string, workers int, timeout time.Duration) ([]Result, erro
 	}
 
 	jobs := make(chan int)
-
-	results, err := runScanPool(host, workers, timeout, jobs)
-	if err != nil {
-		return results, err
-	}
-
 	go func() {
 		for port := range CommonPorts {
 			jobs <- port
 		}
 		close(jobs)
 	}()
+
+	results, err := runScanPool(host, workers, timeout, jobs)
+	if err != nil {
+		return results, err
+	}
 
 	return results, nil
 }

@@ -17,18 +17,17 @@ func ScanRange(startPort int, endPort int, host string, workers int, timeout tim
 	}
 
 	jobs := make(chan int)
-
-	results, err := runScanPool(host, workers, timeout, jobs)
-	if err != nil {
-		return results, err
-	}
-
 	go func() {
 		for port := startPort; port <= endPort; port++ {
 			jobs <- port
 		}
 		close(jobs)
 	}()
+
+	results, err := runScanPool(host, workers, timeout, jobs)
+	if err != nil {
+		return results, err
+	}
 
 	return results, nil
 }
