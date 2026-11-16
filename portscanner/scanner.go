@@ -15,7 +15,7 @@ import (
 // open, closed, timed out, or encountered some other error.
 //
 // The timeout must be positive, the results channel must be writeable.
-func Scan(host string, port int, timeout time.Duration, results chan<- Result) {
+func Scan(host string, port int, timeout time.Duration) Result {
 	result := Result{
 		Host: host,
 		Port: port,
@@ -25,8 +25,7 @@ func Scan(host string, port int, timeout time.Duration, results chan<- Result) {
 		result.Status = Err
 		result.Err = ErrInvalidTimeout
 
-		results <- result
-		return
+		return result
 	}
 
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
@@ -43,12 +42,12 @@ func Scan(host string, port int, timeout time.Duration, results chan<- Result) {
 		}
 		result.Err = err
 
-		results <- result
-		return
+		return result
 	}
 	defer conn.Close()
 
 	result.Status = Open
 	result.Err = nil
-	results <- result
+
+	return result
 }

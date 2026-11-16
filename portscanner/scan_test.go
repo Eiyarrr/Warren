@@ -29,13 +29,10 @@ func TestOpenPort(t *testing.T) {
 		t.Fatalf("failed to parse port: %v", err)
 	}
 
-	result := make(chan portscanner.Result, 1)
-	portscanner.Scan(host, port, 3*time.Second, result)
-	close(result)
+	result := portscanner.Scan(host, port, 3*time.Second)
 
-	r := <-result
-	if r.Status != portscanner.Open {
-		t.Fatalf("expected status %q, got %q", portscanner.Open, r.Status)
+	if result.Status != portscanner.Open {
+		t.Fatalf("expected status %q, got %q", portscanner.Open, result.Status)
 	}
 }
 
@@ -62,12 +59,8 @@ func TestClosedPort(t *testing.T) {
 		t.Fatalf("failed to parse port: %v", err)
 	}
 
-	result := make(chan portscanner.Result, 1)
-	portscanner.Scan(host, port, 3*time.Second, result)
-	close(result)
-
-	r := <-result
-	if r.Status != portscanner.Closed {
-		t.Fatalf("expected status %q, got %q", portscanner.Closed, r.Status)
+	result := portscanner.Scan(host, port, 3*time.Second)
+	if result.Status != portscanner.Closed {
+		t.Fatalf("expected status %q, got %q", portscanner.Closed, result.Status)
 	}
 }

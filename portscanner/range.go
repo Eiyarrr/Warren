@@ -1,7 +1,6 @@
 package portscanner
 
 import (
-	"sync"
 	"time"
 )
 
@@ -17,25 +16,11 @@ func ScanRange(startPort int, endPort int, host string, workers int, timeout tim
 		return nil, ErrInvalidTimeout
 	}
 
-	results := beginScanning(startPort, endPort, host, workers, timeout)
-
-	return results, nil
-}
-
-// beginScanning distributes the specified port range across a worker pool and
-// returns one Result for each port scanned.
-func beginScanning(startPort int, endPort int, host string, workers int, timeout time.Duration) []Result {
 	jobs := make(chan int)
-	results := make(chan Result)
 
-	var wg sync.WaitGroup
-
-	for range workers {
-		wg.Go(func() {
-			for job := range jobs {
-				Scan(host, job, timeout, results)
-			}
-		})
+	results, err := runScanPool(host, workers, timeout, jobs)
+	if err != nil {
+		return results, err
 	}
 
 	go func() {
@@ -45,15 +30,5 @@ func beginScanning(startPort int, endPort int, host string, workers int, timeout
 		close(jobs)
 	}()
 
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
-
-	retResults := []Result{}
-	for result := range results {
-		retResults = append(retResults, result)
-	}
-
-	return retResults
+	return results, nil
 }

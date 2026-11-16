@@ -10,9 +10,21 @@ func TestWorkers(t *testing.T) {
 	startPort := 50000
 	endPort := 50009
 	workers := 3
-	timeoutSeconds := time.Duration(3) * time.Second
+	timeout := 3 * time.Second
 
-	results := beginScanning(startPort, endPort, host, workers, timeoutSeconds)
+	jobs := make(chan int)
+
+	results, err := runScanPool(host, workers, timeout, jobs)
+	if err != nil {
+		t.Fatalf("unexpected error running scan pool: %v", err)
+	}
+
+	go func() {
+		for port := startPort; port <= endPort; port++ {
+			jobs <- port
+		}
+		close(jobs)
+	}()
 
 	expectedCount := endPort - startPort + 1
 	seenPorts := make(map[int]bool)
