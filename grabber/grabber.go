@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -18,6 +19,9 @@ func GrabBanner(host string, port int, timeout time.Duration, maxBytes int) (str
 	if err != nil {
 		var netErr net.Error
 		if errors.As(err, &netErr) && netErr.Timeout() {
+			return "", false, nil
+		}
+		if errors.Is(err, syscall.ECONNREFUSED) || errors.Is(err, syscall.ECONNRESET) {
 			return "", false, nil
 		}
 		return "", false, err
@@ -41,7 +45,7 @@ func GrabBanner(host string, port int, timeout time.Duration, maxBytes int) (str
 			if errors.As(err, &netErr) && netErr.Timeout() {
 				break
 			}
-			if errors.Is(err, io.EOF) {
+			if errors.Is(err, io.EOF) || errors.Is(err, syscall.ECONNREFUSED) || errors.Is(err, syscall.ECONNRESET) || errors.Is(err, syscall.EPIPE) {
 				break
 			}
 			return "", false, err
