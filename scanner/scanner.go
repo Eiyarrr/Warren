@@ -23,7 +23,7 @@ func Scan(host string, port int, timeout time.Duration) Result {
 
 	if timeout <= 0 {
 		result.Status = Err
-		result.Err = ErrInvalidTimeout
+		result.Error = ErrInvalidTimeout
 
 		return result
 	}
@@ -40,14 +40,14 @@ func Scan(host string, port int, timeout time.Duration) Result {
 		} else {
 			result.Status = Err
 		}
-		result.Err = err
+		result.Error = err
 
 		return result
 	}
 	defer conn.Close()
 
 	result.Status = Open
-	result.Err = nil
+	result.Error = nil
 
 	return result
 }

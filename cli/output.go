@@ -16,24 +16,27 @@ func printResults(results []scanner.Result, openOnly bool) {
 	fmt.Println()
 	fmt.Fprintln(w, "HOST\tPORT\tSTATUS\tERROR\tBANNER")
 
-	for _, result := range results {
-		if openOnly && result.Status != scanner.Open {
+	arrOut := make([]Output, len(results))
+	for i, result := range results {
+		arrOut[i].FillFromScan(result)
+	}
+
+	for _, out := range arrOut {
+		if openOnly && out.Status != scanner.Open {
 			continue
 		}
 
 		errMsg := "-"
-		if result.Err != nil {
-			errMsg = result.Err.Error()
+		if out.Error != nil {
+			errMsg = out.Error.Error()
 		}
 
-		banner := "=="
-		banner, _, err := grabber.GrabBanner(result.Host, result.Port, 3*time.Second, 4000)
+		banner, _, err := grabber.GrabBanner(out.Host, out.Port, 3*time.Second, 4000)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("er bander: ", err)
 		}
-
-		coloredStatus := getStatusColor(result.Status)(result.Status.String())
-		fmt.Fprintf(w, "%s\t%d\t%s\t%s%s\t%s\n", result.Host, result.Port, coloredStatus, "         ", errMsg, banner)
+		coloredStatus := getStatusColor(out.Status)(out.Status.String())
+		fmt.Fprintf(w, "%s\t%d\t%s\t%s%s\t%s\n", out.Host, out.Port, coloredStatus, "         ", errMsg, banner)
 	}
 
 	w.Flush()

@@ -6,7 +6,7 @@ type Result struct {
 	Host   string
 	Port   int
 	Status Status
-	Err    error
+	Error  error
 }
 
 // Status represents the possible states of a port.
