@@ -26,15 +26,20 @@ func printResults(results []scanner.Result, openOnly bool) {
 			continue
 		}
 
+		var banner string
+		if out.Status == scanner.Open {
+			var err error
+			banner, _, err = grabber.GrabBanner(out.Host, out.Port, 3*time.Second, 4000)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
 		errMsg := "-"
 		if out.Error != nil {
 			errMsg = out.Error.Error()
 		}
 
-		banner, _, err := grabber.GrabBanner(out.Host, out.Port, 3*time.Second, 4000)
-		if err != nil {
-			fmt.Println("err banner: ", err)
-		}
 		coloredStatus := getStatusColor(out.Status)(out.Status.String())
 		fmt.Fprintf(w, "%s\t%d\t%s\t%s%s\t%s\n", out.Host, out.Port, coloredStatus, "         ", errMsg, banner)
 	}
